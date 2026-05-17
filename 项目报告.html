@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>亚马逊AI工作流 — 项目报告</title>
+<style>
+  @page { size: A4; margin: 0; }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'PingFang SC', 'Microsoft YaHei', -apple-system, sans-serif; color: #1a1a2e; line-height: 1.8; font-size: 13px; }
+  .cover { height: 297mm; background: linear-gradient(160deg, #0a0e17 0%, #1a1030 40%, #16213e 100%); color: #fff; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; page-break-after: always; }
+  .cover h1 { font-size: 3em; background: linear-gradient(135deg, #ff9900, #ff6600); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 20px; }
+  .cover .subtitle { font-size: 1.3em; color: #8b8fa3; margin-bottom: 40px; max-width: 600px; }
+  .cover .meta { font-size: 14px; color: #888; }
+  .cover .meta span { display: block; margin: 4px 0; }
+  .page { padding: 50px 60px; max-width: 210mm; margin: 0 auto; }
+  .section { margin-bottom: 36px; page-break-inside: avoid; }
+  h2 { font-size: 1.6em; color: #ff9900; border-bottom: 2px solid #ff9900; padding-bottom: 8px; margin-bottom: 20px; }
+  h3 { font-size: 1.2em; color: #333; margin: 16px 0 8px; }
+  p { color: #444; margin: 6px 0; }
+  .feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .feature-card { background: #f8f9fa; border-radius: 12px; padding: 18px; border-left: 4px solid #ff9900; }
+  .feature-card h4 { color: #ff9900; margin-bottom: 6px; }
+  .feature-card p { font-size: 12px; color: #555; }
+  .tech-stack { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+  .tech-tag { background: #fff3e0; color: #e65100; padding: 4px 14px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+  .architecture { background: #1a1a2e; color: #e1e4ed; border-radius: 12px; padding: 24px; font-family: 'Courier New', monospace; font-size: 12px; line-height: 2; white-space: pre; }
+  table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+  th { background: #ff9900; color: #fff; padding: 10px 14px; text-align: left; font-size: 12px; }
+  td { padding: 8px 14px; border-bottom: 1px solid #eee; font-size: 12px; }
+  tr:nth-child(even) td { background: #fafafa; }
+  .showcase { background: #f0f0f5; border-radius: 16px; padding: 24px; margin: 16px 0; }
+  .showcase img { max-width: 100%; border-radius: 8px; border: 1px solid #ddd; }
+  .showcase-label { font-weight: 600; color: #ff9900; margin-bottom: 8px; }
+  ul { margin-left: 20px; color: #444; }
+  li { margin: 4px 0; }
+  .stat-row { display: flex; gap: 20px; margin: 16px 0; }
+  .stat-box { flex: 1; text-align: center; background: linear-gradient(135deg, #fff3e0, #ffe0b2); padding: 20px; border-radius: 12px; }
+  .stat-box .num { font-size: 2em; font-weight: 700; color: #e65100; }
+  .stat-box .label { font-size: 12px; color: #666; margin-top: 4px; }
+  .footer { text-align: center; color: #999; padding: 40px; font-size: 11px; border-top: 1px solid #eee; }
+  .highlight { background: linear-gradient(transparent 60%, #ffe0b2 60%); }
+  .screen-mock { background: #0f1117; border-radius: 12px; padding: 20px; margin: 12px 0; color: #e1e4ed; }
+  .screen-mock .bar { display: flex; gap: 8px; margin-bottom: 16px; }
+  .screen-mock .bar span { width: 12px; height: 12px; border-radius: 50%; }
+  .screen-mock .tabs { display: flex; gap: 8px; margin-bottom: 12px; }
+  .screen-mock .tab { padding: 6px 16px; border-radius: 20px; font-size: 12px; }
+  .screen-mock .tab.active { background: #ff9900; color: #000; }
+  .screen-mock .tab.inactive { background: rgba(255,255,255,0.06); }
+  .screen-mock .mock-input { background: rgba(255,255,255,0.05); border-radius: 8px; padding: 10px; margin: 6px 0; font-size: 11px; color: #8b8fa3; }
+  .screen-mock .mock-btn { background: #ff9900; color: #000; padding: 8px 24px; border-radius: 20px; font-weight: 600; display: inline-block; font-size: 12px; }
+  .screen-mock .mock-result { background: rgba(255,255,255,0.03); border-radius: 8px; padding: 14px; margin-top: 12px; }
+  .screen-mock .mock-result h5 { color: #ffaa22; margin-bottom: 6px; }
+  .screen-mock .mock-result p { color: #8b8fa3; font-size: 11px; }
+</style>
+</head>
+<body>
+
+<!-- 封面 -->
+<div class="cover">
+  <h1>🦞 Amazon AI Workflow</h1>
+  <div class="subtitle">亚马逊跨境电商全流程AI工作流<br>竞品分析 · AI内容优化 · 多语言本地化 · 评论情感分析</div>
+  <div class="meta">
+    <span><strong>开发者：</strong>3074866775-byte</span>
+    <span><strong>GitHub：</strong>github.com/3074866775-byte/amazon-ai-workflow</span>
+    <span><strong>技术栈：</strong>Node.js + Express + DeepSeek v4 Pro + Puppeteer</span>
+    <span><strong>日期：</strong>2026年5月</span>
+  </div>
+</div>
+
+<!-- 第1页：项目概述 -->
+<div class="page">
+  <div class="section">
+    <h2>📋 项目概述</h2>
+    <p>这是一款面向<span class="highlight"><strong>亚马逊跨境电商卖家</strong></span>的AI全流程工作流工具。针对卖家日常运营中<strong>Listing编写耗时、竞品分析困难、多语言翻译成本高</strong>的痛点，将AI大模型能力深度整合到跨境电商工作流中，实现从竞品调研到内容输出的全链路自动化。</p>
+    
+    <div class="stat-row">
+      <div class="stat-box"><div class="num">6</div><div class="label">API 路由</div></div>
+      <div class="stat-box"><div class="num">3</div><div class="label">功能模块</div></div>
+      <div class="stat-box"><div class="num">12</div><div class="label">目标语言</div></div>
+      <div class="stat-box"><div class="num">~3500</div><div class="label">行代码</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>🎯 解决的业务痛点</h2>
+    <table>
+      <tr><th>痛点</th><th>传统方式</th><th>本工具方案</th></tr>
+      <tr><td>Listing 编写</td><td>手动撰写，缺乏竞品对标</td><td>爬取竞品 → AI对比分析 → 合规重写</td></tr>
+      <tr><td>多语言翻译</td><td>逐语言找翻译，成本高、不统一</td><td>一次生成12语种，文化适配非直译</td></tr>
+      <tr><td>竞品分析</td><td>人工浏览、手动记录</td><td>URL输入 → 自动爬取 → 结构化提取</td></tr>
+      <tr><td>评论洞察</td><td>逐条翻看，难以系统分析</td><td>批量采集 → AI深度情感分析 → 策略报告</td></tr>
+      <tr><td>A+ Content</td><td>找设计师+文案，周期长</td><td>AI一键生成品牌故事、对比表、规格模块</td></tr>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2>🛠️ 技术架构</h2>
+    <div class="architecture">
+┌─────────────────────────────────────┐
+│           前端 SPA (零框架)            │
+│  index.html — 3模式切换、响应式布局    │
+├─────────────────────────────────────┤
+│         Express API 路由层            │
+│  /api/scrape      单页爬取           │
+│  /api/scrape-all  批量爬取(返回状态)   │
+│  /api/scrape-reviews  评论爬取       │
+│  /api/analyze-reviews  AI分析       │
+│  /api/generate     Listing生成+翻译  │
+│  /api/generate-aplus  A+ Content    │
+├─────────────────────────────────────┤
+│           数据 & AI 层               │
+│  Cheerio (静态HTML解析)              │
+│  Puppeteer (无头Chrome/动态内容)     │
+│  DeepSeek v4 Pro API               │
+│  Axios (HTTP请求)                   │
+└─────────────────────────────────────┘</div>
+  </div>
+</div>
+
+<!-- 第2页：功能模块 -->
+<div class="page">
+  <div class="section">
+    <h2>✨ 三大功能模块</h2>
+
+    <h3>模块一 📋 Listing 优化生成</h3>
+    <div class="screen-mock">
+      <div class="bar"><span style="background:#ff5f57;"></span><span style="background:#febc2e;"></span><span style="background:#28c840;"></span></div>
+      <div class="tabs">
+        <span class="tab active">📋 Listing生成</span>
+        <span class="tab inactive">🖼️ A+ Content</span>
+        <span class="tab inactive">📊 评论分析</span>
+      </div>
+      <div class="mock-input">产品名称: Wireless Noise Cancelling Earbuds</div>
+      <div class="mock-input">核心卖点: 40h battery, IPX7 waterproof, low latency</div>
+      <div class="mock-input" style="display:flex; justify-content:space-between;">竞品URL #1: amazon.com/dp/B0XXXX ✅ <span style="color:#51cf66;">爬取成功</span></div>
+      <div class="mock-btn" style="margin-top:8px;">🚀 开始生成</div>
+      <div class="mock-result">
+        <h5>📌 English · 产品标题</h5>
+        <p>Wireless Noise Cancelling Earbuds, 40H Battery Life, IPX7 Waterproof...</p>
+        <h5>📋 五点描述</h5>
+        <p>1. Immersive ANC — advanced hybrid noise cancellation reduces ambient...</p>
+        <p style="margin-top:8px;color:#51cf66;">✅ 已生成 5 个语言版本 | FR · DE · ES · JP</p>
+      </div>
+    </div>
+    <p style="margin-top:8px;font-size:12px;color:#666;">▲ 输入产品信息 + 竞品链接 → AI生成优化Listing → 多语言一键切换</p>
+
+    <h3>模块二 🖼️ A+ Content 生成</h3>
+    <div class="screen-mock">
+      <div class="bar"><span style="background:#ff5f57;"></span><span style="background:#febc2e;"></span><span style="background:#28c840;"></span></div>
+      <div class="mock-result">
+        <h5>🏷️ 品牌故事</h5>
+        <p>At [Brand], we believe great sound should be accessible to everyone...</p>
+        <h5>📊 产品对比表</h5>
+        <p>| 功能 | 旗舰款 | 竞品A | 竞品B |</p>
+        <h5>🖼️ 场景化模块</h5>
+        <p>模块1: 通勤场景 · 模块2: 运动场景 · 模块3: 办公场景</p>
+      </div>
+    </div>
+
+    <h3>模块三 📊 竞品评论情感分析</h3>
+    <div class="screen-mock">
+      <div class="bar"><span style="background:#ff5f57;"></span><span style="background:#febc2e;"></span><span style="background:#28c840;"></span></div>
+      <div class="mock-result">
+        <h5>🔥 高频痛点</h5>
+        <p>• 材质问题：30%差评提到耳塞材质过敏<br>• 续航虚标：25%反映实际续航不到宣传的一半</p>
+        <h5>⭐ 高频赞美</h5>
+        <p>• 降噪效果：45%好评称赞ANC性能<br>• 佩戴舒适：38%认可长时间佩戴</p>
+        <h5>📈 综合评分卡</h5>
+        <p>产品质量 7/10 · 性价比 6/10 · 包装 8/10 · 描述准确性 5/10</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 第3页：技术亮点 -->
+<div class="page">
+  <div class="section">
+    <h2>🔧 技术亮点</h2>
+    
+    <div class="feature-grid">
+      <div class="feature-card">
+        <h4>🔍 双引擎爬虫</h4>
+        <p>Cheerio静态解析 + Puppeteer无头浏览器。产品页无需登录直接爬取，评论页支持Cookie登录态。每种结果可视化反馈（✅/❌），拒绝静默失败。</p>
+      </div>
+      <div class="feature-card">
+        <h4>🤖 DeepSeek v4 Pro</h4>
+        <p>调用最新DeepSeek大模型进行内容生成和分析。Listing重写严格合规，不抄袭竞品；评论分析数据驱动，输出结构化报告包含8大维度。</p>
+      </div>
+      <div class="feature-card">
+        <h4>🌍 12语种本地化翻译</h4>
+        <p>支持EN/FR/DE/ES/IT/JP/PT/NL/PL/SV/AR/TR。非直译而是文化适配：日文用敬体、法文用优雅表达、阿拉伯文RTL排版。</p>
+      </div>
+      <div class="feature-card">
+        <h4>⚡ 零框架SPA</h4>
+        <p>前端采用原生HTML/CSS/JS构建，零依赖、体积轻量。3种模式无缝切换，响应式布局适配手机/平板/桌面，首屏加载即用。</p>
+      </div>
+      <div class="feature-card">
+        <h4>🔄 智能爬取状态透明化</h4>
+        <p>每个竞品URL返回详细状态（成功/被拦截/失败），无竞品数据时弹窗警告，确保用户知道AI的分析依据是什么。</p>
+      </div>
+      <div class="feature-card">
+        <h4>☁️ 云端部署</h4>
+        <p>支持Vercel一键部署，GitHub Actions自动构建。本地npm start即用，云端vercel.app公网访问，满足不同使用场景。</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>📦 技术栈</h2>
+    <div class="tech-stack">
+      <span class="tech-tag">Node.js</span>
+      <span class="tech-tag">Express</span>
+      <span class="tech-tag">Cheerio</span>
+      <span class="tech-tag">Puppeteer</span>
+      <span class="tech-tag">Axios</span>
+      <span class="tech-tag">DeepSeek API</span>
+      <span class="tech-tag">Multer</span>
+      <span class="tech-tag">原生 CSS</span>
+      <span class="tech-tag">SPA 架构</span>
+      <span class="tech-tag">Vercel</span>
+      <span class="tech-tag">GitHub API</span>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>📊 代码统计</h2>
+    <table>
+      <tr><th>文件</th><th>说明</th><th>代码量</th></tr>
+      <tr><td>server.js</td><td>Express后端（6个API路由 + 爬虫引擎）</td><td>~1000行</td></tr>
+      <tr><td>public/index.html</td><td>SPA前端（3模式切换 + 完整交互逻辑）</td><td>~2500行</td></tr>
+      <tr><td>package.json</td><td>依赖管理（5个npm包）</td><td>~25行</td></tr>
+      <tr><td>README.md</td><td>项目文档</td><td>~80行</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="footer">
+  <p>© 2026 · 3074866775-byte · github.com/3074866775-byte/amazon-ai-workflow</p>
+  <p>在线演示: amazon-ai-workflow.vercel.app · 展示页: 3074866775-byte.github.io/amazon-ai-workflow</p>
+</div>
+
+</body>
+</html>
