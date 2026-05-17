@@ -1148,13 +1148,17 @@ List 3-6 real usage scenarios discovered from reviews.
   }
 });
 
-// 启动服务
-app.listen(PORT, () => {
-  console.log(`\n🚀 亚马逊AI工作流已启动: http://localhost:${PORT}\n`);
-  console.log('  功能：');
-  console.log('  📋 竞品页面爬取（最多5个）');
-  console.log('  🤖 DeepSeek v4 Pro 内容优化生成');
-  console.log('  🌍 多语言本地化翻译');
-  console.log('  📊 竞品评论情感分析');
-  console.log('  📋 快速版本切换\n');
-});
+// 启动服务（本地开发） / Vercel serverless 导出
+if (process.env.VERCEL) {
+  module.exports = app;
+} else {
+  app.listen(PORT, () => {
+    console.log(`\n🚀 亚马逊AI工作流已启动: http://localhost:${PORT}\n`);
+    console.log('  功能：');
+    console.log('  📋 竞品页面爬取（最多5个）');
+    console.log('  🤖 DeepSeek v4 Pro 内容优化生成');
+    console.log('  🌍 多语言本地化翻译');
+    console.log('  📊 竞品评论情感分析');
+    console.log('  📋 快速版本切换\n');
+  });
+}
