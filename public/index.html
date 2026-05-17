@@ -1,0 +1,2773 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>亚马逊AI工作流 - DeepSeek v4 Pro</title>
+<style>
+  :root {
+    --bg: #0f1117;
+    --card: #1a1d27;
+    --card-hover: #222636;
+    --border: #2a2d3a;
+    --text: #e1e4ed;
+    --text-secondary: #8b8fa3;
+    --accent: #ff9900;
+    --accent-hover: #ffaa22;
+    --accent-dim: rgba(255,153,0,0.12);
+    --success: #2ecc71;
+    --danger: #e74c3c;
+    --info: #3498db;
+    --radius: 12px;
+    --radius-sm: 8px;
+    --radius-xs: 6px;
+    --shadow: 0 4px 24px rgba(0,0,0,0.3);
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* ===== Header ===== */
+  .header {
+    background: linear-gradient(135deg, #1a1d27 0%, #1f2536 50%, #1a1d27 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(20px);
+  }
+  .header-inner {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .logo-icon {
+    font-size: 32px;
+  }
+  .logo-text h1 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.5px;
+  }
+  .logo-text span {
+    font-size: 12px;
+    color: var(--accent);
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  .header-badge {
+    background: var(--accent-dim);
+    border: 1px solid rgba(255,153,0,0.25);
+    color: var(--accent);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  /* ===== Layout ===== */
+  .container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 24px;
+    display: grid;
+    grid-template-columns: 480px 1fr;
+    gap: 24px;
+    min-height: calc(100vh - 100px);
+  }
+  @media (max-width: 1100px) {
+    .container { grid-template-columns: 1fr; }
+  }
+
+  /* ===== Cards ===== */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    transition: border-color 0.2s;
+  }
+  .card:hover { border-color: #3a3d4a; }
+  .card-title {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text);
+  }
+  .card-title .icon { font-size: 18px; }
+
+  /* ===== Form Elements ===== */
+  .form-group { margin-bottom: 16px; }
+  .form-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .form-label .required { color: var(--accent); margin-left: 2px; }
+  .form-input, .form-textarea, .form-select {
+    width: 100%;
+    background: #111318;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    color: var(--text);
+    font-size: 14px;
+    font-family: inherit;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .form-input:focus, .form-textarea:focus, .form-select:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-dim);
+  }
+  .form-input::placeholder, .form-textarea::placeholder { color: #4a4d5a; }
+  .form-textarea { resize: vertical; min-height: 80px; }
+
+  /* ===== URL Input Group ===== */
+  .url-list { display: flex; flex-direction: column; gap: 8px; }
+  .url-row {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .url-row .form-input { flex: 1; }
+  .url-row .url-index {
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 700;
+    min-width: 24px;
+    text-align: center;
+  }
+  .btn-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: var(--radius-xs);
+    border: 1px solid var(--border);
+    background: #111318;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+  }
+  .btn-icon:hover { border-color: var(--danger); color: var(--danger); }
+  .btn-icon.add:hover { border-color: var(--success); color: var(--success); }
+  .url-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  /* ===== Buttons ===== */
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 20px;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+    font-family: inherit;
+    white-space: nowrap;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), #e68900);
+    color: #000;
+  }
+  .btn-primary:hover { background: var(--accent-hover); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(255,153,0,0.3); }
+  .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+  .btn-secondary {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+  }
+  .btn-secondary:hover { background: var(--card-hover); border-color: #4a4d5a; }
+  .btn-sm {
+    padding: 5px 12px;
+    font-size: 12px;
+    border-radius: var(--radius-xs);
+  }
+  .btn-full {
+    width: 100%;
+    justify-content: center;
+    padding: 14px;
+    font-size: 15px;
+  }
+  .btn-copy {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 4px 10px;
+    border-radius: var(--radius-xs);
+    font-size: 11px;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+  .btn-copy:hover { border-color: var(--accent); color: var(--accent); }
+  .btn-copy.copied { border-color: var(--success); color: var(--success); background: rgba(46,204,113,0.1); }
+
+  /* ===== Competitor Toggle ===== */
+  .input-mode-toggle {
+    display: flex;
+    gap: 2px;
+    background: #111318;
+    border-radius: var(--radius-sm);
+    padding: 3px;
+    margin-bottom: 12px;
+  }
+  .input-mode-btn {
+    flex: 1;
+    padding: 8px 12px;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+  }
+  .input-mode-btn.active {
+    background: var(--accent);
+    color: #000;
+  }
+
+  /* ===== Language Checkboxes ===== */
+  .lang-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 8px;
+  }
+  .lang-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 10px;
+    background: #111318;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xs);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 13px;
+    user-select: none;
+  }
+  .lang-checkbox:hover { border-color: #4a4d5a; }
+  .lang-checkbox.checked {
+    border-color: var(--accent);
+    background: var(--accent-dim);
+  }
+  .lang-checkbox input { display: none; }
+  .lang-checkbox .flag { font-size: 16px; }
+  .lang-checkbox .code {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+  }
+
+  /* ===== Results Section ===== */
+  .results-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .tab-bar {
+    display: flex;
+    gap: 4px;
+    background: #111318;
+    border-radius: var(--radius-sm);
+    padding: 4px;
+    overflow-x: auto;
+    flex-wrap: wrap;
+  }
+  .tab-btn {
+    padding: 10px 16px;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+  }
+  .tab-btn:hover { color: var(--text); background: rgba(255,255,255,0.04); }
+  .tab-btn.active {
+    background: var(--accent);
+    color: #000;
+  }
+
+  .result-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+  }
+  .result-section {
+    margin-bottom: 24px;
+  }
+  .result-section:last-child { margin-bottom: 0; }
+  .result-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .result-section-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .result-content {
+    background: #111318;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+  }
+  .result-content.title-content {
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.4;
+    color: #fff;
+  }
+  .result-content ul {
+    list-style: none;
+    padding: 0;
+  }
+  .result-content ul li {
+    padding: 8px 0;
+    padding-left: 20px;
+    position: relative;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .result-content ul li:last-child { border-bottom: none; }
+  .result-content ul li::before {
+    content: '▸';
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+    font-size: 12px;
+  }
+  .result-content.description-content {
+    font-size: 14px;
+    line-height: 1.8;
+  }
+
+  /* ===== Status ===== */
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .status-pending { background: rgba(255,255,255,0.05); color: var(--text-secondary); }
+  .status-scraping { background: rgba(52,152,219,0.15); color: var(--info); }
+  .status-generating { background: rgba(255,153,0,0.15); color: var(--accent); }
+  .status-done { background: rgba(46,204,113,0.15); color: var(--success); }
+  .status-error { background: rgba(231,76,60,0.15); color: var(--danger); }
+
+  .spinner {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid currentColor;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ===== Empty / Placeholder State ===== */
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 40px;
+    text-align: center;
+    color: var(--text-secondary);
+  }
+  .empty-state .icon { font-size: 48px; margin-bottom: 12px; opacity: 0.3; }
+  .empty-state h3 { font-size: 16px; margin-bottom: 6px; color: var(--text); }
+  .empty-state p { font-size: 13px; max-width: 360px; line-height: 1.7; }
+
+  .placeholder-card {
+    border: 1px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 32px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 28px;
+  }
+  .placeholder-section {}
+  .placeholder-label {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+    opacity: 0.6;
+  }
+  .placeholder-line {
+    height: 14px;
+    background: linear-gradient(90deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.03) 100%);
+    border-radius: 4px;
+    margin-bottom: 8px;
+    animation: shimmer 2s infinite;
+  }
+  .placeholder-line.title-line { height: 22px; width: 85%; }
+  .placeholder-line.bullet-line { width: 75%; }
+  .placeholder-line.bullet-line:nth-child(3) { width: 65%; }
+  .placeholder-line.bullet-line:nth-child(4) { width: 80%; }
+  .placeholder-line.bullet-line:nth-child(5) { width: 60%; }
+  .placeholder-line.desc-line { width: 90%; }
+  .placeholder-line.desc-line:nth-child(2) { width: 82%; }
+  .placeholder-line.desc-line:nth-child(3) { width: 70%; }
+  .placeholder-line.desc-line:nth-child(4) { width: 88%; }
+  .placeholder-line.desc-line:nth-child(5) { width: 55%; }
+  .placeholder-dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 50%;
+    margin-right: 10px;
+    vertical-align: middle;
+    position: relative;
+    top: -1px;
+  }
+  @keyframes shimmer {
+    0% { opacity: 0.4; }
+    50% { opacity: 0.8; }
+    100% { opacity: 0.4; }
+  }
+
+  /* ===== Manual Paste ===== */
+  .competitor-manual {
+    display: none;
+  }
+  .competitor-manual.active {
+    display: block;
+  }
+  .manual-competitor-card {
+    background: #111318;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 16px;
+    margin-bottom: 12px;
+  }
+  .manual-competitor-card .form-group { margin-bottom: 10px; }
+  .manual-competitor-card .form-group:last-child { margin-bottom: 0; }
+
+  /* ===== Progress ===== */
+  .progress-bar {
+    height: 4px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 12px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent), #e68900);
+    border-radius: 2px;
+    transition: width 0.3s;
+  }
+
+  /* ===== Toast ===== */
+  .toast {
+    position: fixed;
+    top: 24px;
+    right: 24px;
+    background: var(--card);
+    border: 1px solid var(--success);
+    color: var(--success);
+    padding: 12px 20px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    font-weight: 600;
+    box-shadow: var(--shadow);
+    z-index: 1000;
+    animation: slideIn 0.3s ease;
+  }
+  @keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+
+  /* ===== Scraped Preview ===== */
+  .scrape-results {
+    margin-top: 12px;
+    max-height: 300px;
+    overflow-y: auto;
+  }
+  .scrape-item {
+    background: #111318;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xs);
+    padding: 10px 14px;
+    margin-bottom: 8px;
+    font-size: 12px;
+  }
+  .scrape-item .scrape-url {
+    color: var(--info);
+    word-break: break-all;
+    margin-bottom: 4px;
+    font-weight: 600;
+  }
+  .scrape-item .scrape-summary {
+    color: var(--text-secondary);
+  }
+  .scrape-item .scrape-error {
+    color: var(--danger);
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #4a4d5a; }
+
+  .api-hint {
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin-top: 4px;
+  }
+  .api-hint a { color: var(--info); text-decoration: none; }
+  .api-hint a:hover { text-decoration: underline; }
+
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 20px 0;
+  }
+
+  .char-count {
+    font-size: 11px;
+    color: var(--text-secondary);
+    text-align: right;
+    margin-top: 4px;
+  }
+
+  /* ===== Mode Toggle ===== */
+  .mode-toggle {
+    display: flex;
+    background: #111318;
+    border-radius: var(--radius-sm);
+    padding: 3px;
+    margin-bottom: 20px;
+  }
+  .mode-btn {
+    flex: 1;
+    padding: 10px 16px;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .mode-btn.active {
+    background: var(--accent);
+    color: #000;
+  }
+
+  /* ===== A+ Content: Image Upload ===== */
+  .upload-zone {
+    border: 2px dashed var(--border);
+    border-radius: var(--radius);
+    padding: 32px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 16px;
+    background: #111318;
+  }
+  .upload-zone:hover { border-color: var(--accent); background: var(--accent-dim); }
+  .upload-zone.dragover { border-color: var(--accent); background: var(--accent-dim); }
+  .upload-zone .upload-icon { font-size: 36px; margin-bottom: 8px; }
+  .upload-zone .upload-text { font-size: 14px; color: var(--text-secondary); }
+  .upload-zone .upload-hint { font-size: 11px; color: #4a4d5a; margin-top: 4px; }
+
+  .image-preview-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .image-preview-card {
+    background: #111318;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    position: relative;
+  }
+  .image-preview-card img {
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+    display: block;
+  }
+  .image-preview-card .img-label {
+    padding: 6px 8px;
+  }
+  .image-preview-card .img-label input {
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-size: 11px;
+    font-family: inherit;
+    outline: none;
+  }
+  .image-preview-card .img-label input::placeholder { color: #4a4d5a; }
+  .image-preview-card .img-remove {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: rgba(0,0,0,0.7);
+    border: none;
+    color: var(--danger);
+    cursor: pointer;
+    font-size: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .image-preview-card:hover .img-remove { opacity: 1; }
+
+  /* ===== A+ Content: Results ===== */
+  .aplus-module {
+    background: #111318;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 20px;
+    margin-bottom: 16px;
+  }
+  .aplus-module-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  .aplus-module-type {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .aplus-module-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #fff;
+    margin-bottom: 8px;
+  }
+  .aplus-module-body {
+    font-size: 14px;
+    color: var(--text);
+    line-height: 1.8;
+  }
+  .aplus-module-img {
+    width: 100%;
+    max-height: 300px;
+    object-fit: contain;
+    border-radius: var(--radius-xs);
+    margin-bottom: 12px;
+    background: #0a0b0e;
+  }
+  .aplus-module-label {
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+  }
+
+  /* Comparison Table */
+  .aplus-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 8px;
+  }
+  .aplus-table th, .aplus-table td {
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .aplus-table th {
+    background: #0a0b0e;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .aplus-table td:first-child { font-weight: 600; }
+
+  /* Feature Grid */
+  .aplus-features {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+  }
+  .aplus-feature-item {
+    background: #0a0b0e;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-xs);
+    padding: 14px;
+  }
+  .aplus-feature-item .feature-icon { font-size: 24px; margin-bottom: 6px; }
+  .aplus-feature-item .feature-headline { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+  .aplus-feature-item .feature-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.6; }
+
+  /* Specs List */
+  .aplus-specs {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+  }
+  .aplus-spec-row {
+    display: flex;
+    padding: 8px 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .aplus-spec-label { font-weight: 600; color: var(--text-secondary); min-width: 120px; font-size: 13px; }
+  .aplus-spec-value { color: var(--text); font-size: 13px; }
+
+  /* ===== Edit Mode ===== */
+  .edit-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 16px;
+    padding: 12px 16px;
+    background: #111318;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+  }
+  .edit-input {
+    width: 100%;
+    background: #0a0b0e;
+    border: 1px solid var(--accent);
+    border-radius: var(--radius-xs);
+    padding: 8px 12px;
+    color: var(--text);
+    font-size: inherit;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .edit-input:focus { border-color: var(--success); box-shadow: 0 0 0 2px rgba(46,204,113,0.2); }
+  .edit-textarea {
+    width: 100%;
+    background: #0a0b0e;
+    border: 1px solid var(--accent);
+    border-radius: var(--radius-xs);
+    padding: 8px 12px;
+    color: var(--text);
+    font-size: inherit;
+    font-family: inherit;
+    outline: none;
+    resize: vertical;
+    min-height: 80px;
+    transition: border-color 0.2s;
+  }
+  .edit-textarea:focus { border-color: var(--success); box-shadow: 0 0 0 2px rgba(46,204,113,0.2); }
+  .edit-indicator {
+    font-size: 11px;
+    color: var(--success);
+    font-weight: 600;
+  }
+
+  /* ===== Review Report ===== */
+  #reviewReport { font-size:14px;line-height:1.8;color:var(--text);white-space:pre-wrap; }
+  #reviewReport h2 { color:var(--accent);font-size:18px;margin:20px 0 10px;border-bottom:1px solid var(--border);padding-bottom:6px; }
+  #reviewReport h3 { color:var(--accent);font-size:15px;margin:14px 0 8px; }
+  #reviewReport ul,#reviewReport ol { margin:6px 0 6px 20px; }
+  #reviewReport li { margin:4px 0; }
+  #reviewReport strong { color:#ffaa22; }
+  #reviewReport table { width:100%;border-collapse:collapse;margin:12px 0;font-size:13px; }
+  #reviewReport th,#reviewReport td { padding:6px 10px;border:1px solid var(--border);text-align:left; }
+  #reviewReport th { background:rgba(255,255,255,0.06);font-weight:600; }
+  #reviewReport code { background:rgba(255,255,255,0.08);padding:2px 6px;border-radius:4px;font-size:12px; }
+  #reviewProgress { background:var(--surface,#1a1d27);border-radius:12px;padding:10px 14px;font-size:12px;line-height:1.6; }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-icon">📦</div>
+      <div class="logo-text">
+        <h1>亚马逊AI工作流</h1>
+        <span>DeepSeek v4 Pro · Listing Optimizer</span>
+      </div>
+    </div>
+    <div class="header-badge" id="statusBadge">
+      <span class="status-pending">● 待开始</span>
+    </div>
+  </div>
+</div>
+
+<!-- Main Container -->
+<div class="container">
+
+  <!-- ===== LEFT: Input Panel ===== -->
+  <div class="card" style="position:sticky;top:100px;height:fit-content;">
+
+    <!-- Mode Toggle -->
+    <div class="mode-toggle">
+      <button class="mode-btn active" data-mode="listing" onclick="switchMode('listing')">📋 Listing 生成</button>
+      <button class="mode-btn" data-mode="aplus" onclick="switchMode('aplus')">🖼️ A+ Content</button>
+      <button class="mode-btn" data-mode="reviews" onclick="switchMode('reviews')">📊 评论分析</button>
+    </div>
+
+    <!-- ===== LISTING MODE INPUTS ===== -->
+    <div id="listingInputs">
+    <div class="card-title"><span class="icon">⚙️</span> 产品信息 & 设置</div>
+
+    <!-- Product Name -->
+    <div class="form-group">
+      <label class="form-label">产品名称 / 方向 <span class="required">*</span></label>
+      <input type="text" class="form-input" id="productName"
+             placeholder="例如：Bluetooth 5.3 Earbuds with Noise Cancelling">
+    </div>
+
+    <!-- Selling Points -->
+    <div class="form-group">
+      <label class="form-label">核心卖点</label>
+      <textarea class="form-textarea" id="sellingPoints" rows="3"
+                placeholder="例如：40小时续航、IPX7防水、低延迟游戏模式、Type-C快充"></textarea>
+    </div>
+
+    <!-- Notes -->
+    <div class="form-group">
+      <label class="form-label">备注 / 其他重要信息</label>
+      <textarea class="form-textarea" id="notes" rows="2"
+                placeholder="例如：目标售价$29.99、主要面向欧美年轻用户、需要强调环保包装..."></textarea>
+    </div>
+
+    <!-- Character Limits -->
+    <div class="card-title"><span class="icon">📏</span> 字数限制设置</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+      <div class="form-group">
+        <label class="form-label">标题字数范围</label>
+        <div style="display:flex;gap:6px;align-items:center;">
+          <input type="number" class="form-input" id="titleMin" value="150" min="50" max="300" style="width:70px;text-align:center;">
+          <span style="color:var(--text-secondary);">－</span>
+          <input type="number" class="form-input" id="titleMax" value="200" min="50" max="300" style="width:70px;text-align:center;">
+          <span style="font-size:11px;color:var(--text-secondary);">字符</span>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">每条五点字数</label>
+        <div style="display:flex;gap:6px;align-items:center;">
+          <input type="number" class="form-input" id="bulletMin" value="150" min="50" max="500" style="width:70px;text-align:center;">
+          <span style="color:var(--text-secondary);">－</span>
+          <input type="number" class="form-input" id="bulletMax" value="250" min="50" max="500" style="width:70px;text-align:center;">
+          <span style="font-size:11px;color:var(--text-secondary);">字符</span>
+        </div>
+      </div>
+      <div class="form-group" style="grid-column:1/-1;">
+        <label class="form-label">产品描述字数范围</label>
+        <div style="display:flex;gap:6px;align-items:center;">
+          <input type="number" class="form-input" id="descMin" value="800" min="100" max="5000" style="width:80px;text-align:center;">
+          <span style="color:var(--text-secondary);">－</span>
+          <input type="number" class="form-input" id="descMax" value="2000" min="100" max="5000" style="width:80px;text-align:center;">
+          <span style="font-size:11px;color:var(--text-secondary);">字符</span>
+        </div>
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <!-- Competitor Section -->
+    <div class="card-title"><span class="icon">🔍</span> 竞品分析</div>
+
+    <!-- Input Mode Toggle -->
+    <div class="input-mode-toggle">
+      <button class="input-mode-btn active" data-mode="url" onclick="switchInputMode('url')">🔗 URL爬取</button>
+      <button class="input-mode-btn" data-mode="manual" onclick="switchInputMode('manual')">📝 手动粘贴</button>
+    </div>
+
+    <!-- URL Input Mode -->
+    <div id="urlInputSection">
+      <div class="url-list" id="urlList">
+        <div class="url-row">
+          <span class="url-index">#1</span>
+          <input type="url" class="form-input url-input" placeholder="https://www.amazon.com/dp/ASIN">
+          <button class="btn-icon add" onclick="addUrlRow()" title="添加更多">＋</button>
+        </div>
+      </div>
+      <div class="url-actions">
+        <button class="btn btn-secondary btn-sm" onclick="scrapeAllUrls()">
+          🔄 开始爬取竞品数据
+        </button>
+        <span style="font-size:11px;color:var(--text-secondary);margin-left:8px;">最多5个链接</span>
+      </div>
+      <div class="scrape-results" id="scrapeResults"></div>
+    </div>
+
+    <!-- Manual Paste Mode -->
+    <div id="manualInputSection" class="competitor-manual">
+      <div id="manualCompetitors"></div>
+      <button class="btn btn-secondary btn-sm" onclick="addManualCompetitor()" style="margin-top:8px;">
+        ＋ 添加竞品
+      </button>
+      <span style="font-size:11px;color:var(--text-secondary);margin-left:8px;">最多5个</span>
+    </div>
+
+    <hr class="divider">
+
+    <!-- Language Selection -->
+    <div class="card-title"><span class="icon">🌍</span> 翻译版本</div>
+    <div class="lang-grid" id="langGrid">
+      <label class="lang-checkbox checked" data-lang="en">
+        <input type="checkbox" checked> <span class="flag">🇺🇸</span> 英语 <span class="code">EN</span>
+      </label>
+      <label class="lang-checkbox" data-lang="fr">
+        <input type="checkbox"> <span class="flag">🇫🇷</span> 法语 <span class="code">FR</span>
+      </label>
+      <label class="lang-checkbox" data-lang="de">
+        <input type="checkbox"> <span class="flag">🇩🇪</span> 德语 <span class="code">DE</span>
+      </label>
+      <label class="lang-checkbox" data-lang="es">
+        <input type="checkbox"> <span class="flag">🇪🇸</span> 西班牙语 <span class="code">ES</span>
+      </label>
+      <label class="lang-checkbox" data-lang="it">
+        <input type="checkbox"> <span class="flag">🇮🇹</span> 意大利语 <span class="code">IT</span>
+      </label>
+      <label class="lang-checkbox" data-lang="ja">
+        <input type="checkbox"> <span class="flag">🇯🇵</span> 日语 <span class="code">JP</span>
+      </label>
+      <label class="lang-checkbox" data-lang="pt">
+        <input type="checkbox"> <span class="flag">🇧🇷</span> 葡萄牙语 <span class="code">BR</span>
+      </label>
+      <label class="lang-checkbox" data-lang="nl">
+        <input type="checkbox"> <span class="flag">🇳🇱</span> 荷兰语 <span class="code">NL</span>
+      </label>
+      <label class="lang-checkbox" data-lang="pl">
+        <input type="checkbox"> <span class="flag">🇵🇱</span> 波兰语 <span class="code">PL</span>
+      </label>
+      <label class="lang-checkbox" data-lang="sv">
+        <input type="checkbox"> <span class="flag">🇸🇪</span> 瑞典语 <span class="code">SV</span>
+      </label>
+      <label class="lang-checkbox" data-lang="ar">
+        <input type="checkbox"> <span class="flag">🇦🇪</span> 阿拉伯语 <span class="code">AR</span>
+      </label>
+      <label class="lang-checkbox" data-lang="tr">
+        <input type="checkbox"> <span class="flag">🇹🇷</span> 土耳其语 <span class="code">TR</span>
+      </label>
+    </div>
+
+    </div><!-- /listingInputs -->
+
+    <!-- ===== A+ CONTENT MODE INPUTS ===== -->
+    <div id="aplusInputs" style="display:none;">
+      <div class="card-title"><span class="icon">🖼️</span> A+ Content 生成器</div>
+
+      <div class="form-group">
+        <label class="form-label">产品名称 / 方向 <span class="required">*</span></label>
+        <input type="text" class="form-input" id="aplusProductName"
+               placeholder="例如：Wireless Noise Cancelling Headphones">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">核心卖点 / 产品优势</label>
+        <textarea class="form-textarea" id="aplusSellingPoints" rows="2"
+                  placeholder="例如：40小时续航、Hi-Res Audio认证、记忆海绵耳罩、折叠便携"></textarea>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">当前产品页面链接（可选）</label>
+        <input type="url" class="form-input" id="aplusProductUrl"
+               placeholder="https://www.amazon.com/dp/ASIN — 自动爬取页面信息">
+        <button class="btn btn-secondary btn-sm" style="margin-top:6px;" onclick="scrapeAplusProduct()">
+          🔍 爬取当前产品信息
+        </button>
+        <span id="aplusScrapeStatus" style="font-size:11px;color:var(--text-secondary);margin-left:8px;"></span>
+      </div>
+
+      <hr class="divider">
+
+      <!-- Image Upload -->
+      <div class="card-title"><span class="icon">📸</span> 产品图片上传</div>
+
+      <!-- Vision Model Selector -->
+      <div class="form-group" style="margin-bottom:12px;">
+        <label class="form-label">图片理解模型</label>
+        <div class="input-mode-toggle" style="margin-bottom:0;">
+          <button class="input-mode-btn active" data-vision="ds" onclick="switchVisionMode('ds')">🧠 DeepSeek（需手动描述图片）</button>
+          <button class="input-mode-btn" data-vision="openai" onclick="switchVisionMode('openai')">👁️ GPT-4o Vision（自动识图）</button>
+        </div>
+      </div>
+
+      <!-- OpenAI Vision API Key (hidden by default) -->
+      <div class="form-group" id="openaiKeyGroup" style="display:none;">
+        <label class="form-label">OpenAI API Key <span class="required">*</span></label>
+        <input type="password" class="form-input" id="openaiApiKey" placeholder="sk-...">
+        <div class="api-hint">🔑 <a href="https://platform.openai.com/api-keys" target="_blank">platform.openai.com</a></div>
+      </div>
+
+      <!-- DS Image Label Hint -->
+      <div id="dsLabelHint" style="font-size:12px;color:var(--accent);margin-bottom:12px;padding:8px 12px;background:var(--accent-dim);border-radius:var(--radius-xs);">
+        💡 DeepSeek 无法识别图片内容，请在上传后为每张图片填写文字描述
+      </div>
+
+      <div class="upload-zone" id="uploadZone" onclick="document.getElementById('imageInput').click()">
+        <div class="upload-icon">📁</div>
+        <div class="upload-text">点击或拖拽上传产品图片</div>
+        <div class="upload-hint">支持 PNG / JPG / WebP · 每张最大 10MB · 最多10张</div>
+      </div>
+      <input type="file" id="imageInput" accept="image/*" multiple style="display:none;"
+             onchange="handleImageSelect(event)">
+      <div class="image-preview-list" id="imagePreviewList"></div>
+
+      <hr class="divider">
+
+      <!-- Language Selection (shared) -->
+      <div class="card-title"><span class="icon">🌍</span> 翻译版本</div>
+      <div class="lang-grid" id="aplusLangGrid">
+        <label class="lang-checkbox checked" data-lang="en">
+          <input type="checkbox" checked> <span class="flag">🇺🇸</span> 英语 <span class="code">EN</span>
+        </label>
+        <label class="lang-checkbox" data-lang="fr">
+          <input type="checkbox"> <span class="flag">🇫🇷</span> 法语 <span class="code">FR</span>
+        </label>
+        <label class="lang-checkbox" data-lang="de">
+          <input type="checkbox"> <span class="flag">🇩🇪</span> 德语 <span class="code">DE</span>
+        </label>
+        <label class="lang-checkbox" data-lang="es">
+          <input type="checkbox"> <span class="flag">🇪🇸</span> 西班牙语 <span class="code">ES</span>
+        </label>
+        <label class="lang-checkbox" data-lang="it">
+          <input type="checkbox"> <span class="flag">🇮🇹</span> 意大利语 <span class="code">IT</span>
+        </label>
+        <label class="lang-checkbox" data-lang="ja">
+          <input type="checkbox"> <span class="flag">🇯🇵</span> 日语 <span class="code">JP</span>
+        </label>
+        <label class="lang-checkbox" data-lang="pt">
+          <input type="checkbox"> <span class="flag">🇧🇷</span> 葡萄牙语 <span class="code">BR</span>
+        </label>
+        <label class="lang-checkbox" data-lang="nl">
+          <input type="checkbox"> <span class="flag">🇳🇱</span> 荷兰语 <span class="code">NL</span>
+        </label>
+      </div>
+      <button class="btn btn-secondary btn-sm" onclick="addAplusLang()" style="margin-top:8px;">＋ 添加语言</button>
+
+      <hr class="divider">
+
+      <!-- Competitor Data (optional) -->
+      <div class="card-title"><span class="icon">🔍</span> 竞品分析（可选）</div>
+
+      <!-- Input Mode Toggle -->
+      <div class="input-mode-toggle">
+        <button class="input-mode-btn active" data-mode="url" onclick="switchAplusCompMode('url')">🔗 URL爬取</button>
+        <button class="input-mode-btn" data-mode="manual" onclick="switchAplusCompMode('manual')">📝 手动粘贴</button>
+      </div>
+
+      <!-- URL Input Mode -->
+      <div id="aplusUrlSection">
+        <div class="url-list" id="aplusUrlList">
+          <div class="url-row">
+            <span class="url-index">#1</span>
+            <input type="url" class="form-input aplus-url-input" placeholder="https://www.amazon.com/dp/ASIN">
+            <button class="btn-icon add" onclick="addAplusUrlRow()" title="添加更多">＋</button>
+          </div>
+        </div>
+        <div class="url-actions">
+          <button class="btn btn-secondary btn-sm" onclick="scrapeAplusUrls()">🔄 开始爬取竞品数据</button>
+          <span style="font-size:11px;color:var(--text-secondary);margin-left:8px;">最多5个链接</span>
+        </div>
+        <div class="scrape-results" id="aplusScrapeResults"></div>
+      </div>
+
+      <!-- Manual Paste Mode -->
+      <div id="aplusManualSection" class="competitor-manual">
+        <div id="aplusManualCompetitors"></div>
+        <button class="btn btn-secondary btn-sm" onclick="addAplusCompetitor()" style="margin-top:8px;">＋ 添加竞品</button>
+        <span style="font-size:11px;color:var(--text-secondary);margin-left:8px;">粘贴竞品的标题/五点/描述</span>
+      </div>
+    </div><!-- /aplusInputs -->
+
+    <hr class="divider">
+
+    <!-- API Key (shared) -->
+    <div class="form-group">
+      <label class="form-label">DeepSeek API Key <span class="required">*</span></label>
+      <input type="password" class="form-input" id="apiKey"
+             placeholder="sk-xxxxxxxxxxxxxxxxxxxxxxxx">
+      <div class="api-hint">
+        🔑 获取 Key：<a href="https://platform.deepseek.com/api_keys" target="_blank">platform.deepseek.com</a>
+      </div>
+    </div>
+
+    <!-- Generate Button -->
+    <button class="btn btn-primary btn-full" id="generateBtn" onclick="generateAll()">
+      🚀 开始生成 Listing
+    </button>
+
+    <!-- Progress -->
+    <div class="progress-bar" id="progressBar" style="display:none;">
+      <div class="progress-fill" id="progressFill" style="width:0%"></div>
+    </div>
+    <div id="progressText" style="font-size:12px;color:var(--text-secondary);text-align:center;margin-top:8px;"></div>
+  </div>
+
+  <!-- ===== REVIEWS MODE INPUTS ===== -->
+  <div id="reviewInputs" style="display:none;">
+    <div class="card-title"><span class="icon">📊</span> 竞品评论情感分析器</div>
+    <p style="font-size:12px;color:var(--text-secondary);margin:4px 0 12px;">
+      爬取竞品评论 → AI自动分析痛点/赞美/未满足需求 → 输出策略建议
+    </p>
+
+    <div class="form-group">
+      <label class="form-label">🔗 竞品链接（可填多个同类型产品）</label>
+      <div id="reviewUrlList">
+        <div class="url-row">
+          <span class="url-index">#1</span>
+          <input type="url" class="form-input url-input" placeholder="https://www.amazon.com/dp/ASIN">
+          <button class="btn-icon add" onclick="addReviewUrlRow()" title="添加更多">＋</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">📊 爬取评论数量: <strong id="reviewCountDisplay">30</strong> 条</label>
+      <div style="display:flex;align-items:center;gap:12px;">
+        <input type="range" id="reviewCount" min="10" max="100" value="30" step="5" style="flex:1;accent-color:var(--accent);" oninput="document.getElementById('reviewCountDisplay').textContent=this.value;document.getElementById('reviewCountVal').textContent=this.value;">
+        <span id="reviewCountVal" style="min-width:32px;text-align:center;background:var(--surface);padding:2px 8px;border-radius:20px;font-size:13px;font-family:monospace;">30</span>
+      </div>
+    </div>
+
+    <div class="form-group" style="margin-top:8px;">
+      <label class="form-label">🍪 Amazon Cookie（可选，登录后可URL爬取评论）</label>
+      <div style="display:flex;gap:8px;">
+        <input type="text" class="form-input" id="reviewCookie" placeholder='粘贴浏览器登录Amazon后的Cookie JSON，格式：[{"name":"session-id","value":"...","domain":".amazon.com"}]'>
+        <button class="btn btn-secondary btn-sm" onclick="document.getElementById('reviewCookieHelp').style.display='block'" title="如何获取Cookie">❓</button>
+      </div>
+      <div id="reviewCookieHelp" style="display:none;font-size:11px;color:var(--text-secondary);margin-top:6px;padding:10px;background:var(--surface);border-radius:8px;">
+        <strong>如何导出Amazon Cookie：</strong><br>
+        1. 在Chrome中登录 <a href="https://www.amazon.com" target="_blank">amazon.com</a><br>
+        2. 按 <code>F12</code> → <code>Application</code> → <code>Cookies</code> → 选 <code>amazon.com</code><br>
+        3. 全选所有cookie → 右键Copy → 粘贴到上方输入框<br>
+        4. （高级）或用浏览器插件 "EditThisCookie" 导出JSON
+      </div>
+    </div>
+
+    <div class="form-group" style="margin-top:8px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <button class="btn btn-secondary btn-sm" onclick="toggleManualReviews()" id="manualToggleBtn">📝 手动粘贴评论（推荐）</button>
+        <span style="font-size:11px;color:var(--text-secondary);">直接复制评论内容即可分析</span>
+      </div>
+      <textarea class="form-textarea" id="manualReviewInput" rows="8"
+        placeholder="在Amazon打开竞品评论页，全选复制评论内容粘贴到这里即可&#10;&#10;支持格式：直接粘贴评论文本（自动分割）或 评分|标题|内容"
+        style="display:block;margin-top:8px;"></textarea>
+    </div>
+
+    <!-- Review Progress -->
+    <div id="reviewProgress" style="display:none;margin:12px 0;padding:8px 12px;background:var(--surface);border-radius:12px;font-size:12px;max-height:200px;overflow-y:auto;"></div>
+
+    <button class="btn btn-primary btn-full" id="reviewAnalyzeBtn" onclick="startReviewAnalysis()" style="margin-top:12px;">
+      🔬 开始分析
+    </button>
+  </div>
+
+  <!-- ===== REVIEWS RESULTS ===== -->
+  <div id="reviewResults" style="display:none;">
+    <div class="placeholder-card" id="reviewPlaceholder">
+      <div class="placeholder-section">
+        <div class="placeholder-label">📊 分析报告将显示在这里</div>
+        <div class="placeholder-line"></div>
+        <div class="placeholder-line" style="width:60%;"></div>
+        <div class="placeholder-line" style="width:80%;"></div>
+      </div>
+    </div>
+    <div id="reviewStats" style="display:none;margin-bottom:16px;"></div>
+    <div id="reviewReport" style="display:none;"></div>
+    <button class="btn btn-secondary btn-sm" id="copyReviewBtn" style="display:none;margin-top:12px;" onclick="copyReviewReport()">📋 复制报告</button>
+  </div>
+
+  <!-- ===== RIGHT: Results Panel ===== -->
+  <div class="results-panel" id="resultsPanel">
+
+    <!-- ===== LISTING RESULTS ===== -->
+    <div id="listingResults">
+    <!-- Placeholder (before generation) -->
+    <div class="placeholder-card" id="placeholderCard">
+      <div class="placeholder-section">
+        <div class="placeholder-label">📌 产品标题</div>
+        <div class="placeholder-line title-line"></div>
+        <div class="placeholder-line title-line" style="width:50%;"></div>
+      </div>
+      <div class="placeholder-section">
+        <div class="placeholder-label">📝 五点描述</div>
+        <div class="placeholder-line bullet-line"></div>
+        <div class="placeholder-line bullet-line"></div>
+        <div class="placeholder-line bullet-line"></div>
+        <div class="placeholder-line bullet-line"></div>
+        <div class="placeholder-line bullet-line"></div>
+      </div>
+      <div class="placeholder-section">
+        <div class="placeholder-label">📄 产品描述</div>
+        <div class="placeholder-line desc-line"></div>
+        <div class="placeholder-line desc-line"></div>
+        <div class="placeholder-line desc-line"></div>
+        <div class="placeholder-line desc-line"></div>
+        <div class="placeholder-line desc-line"></div>
+      </div>
+      <div class="empty-state">
+        <div class="icon">⚡</div>
+        <h3>输入信息后点击生成</h3>
+        <p>填写产品信息、竞品数据和 API Key，AI 将自动生成优化的 Listing 内容</p>
+      </div>
+    </div>
+
+    <!-- Results Container -->
+    <div id="resultsContainer" style="display:none;">
+      <div class="edit-toolbar" id="listingEditToolbar" style="display:none;">
+        <button class="btn btn-secondary btn-sm" id="listingEditToggle" onclick="toggleListingEdit()">✏️ 编辑当前版本</button>
+        <button class="btn btn-primary btn-sm" id="listingSyncBtn" onclick="syncListingTranslations()" style="display:none;">🔄 同步翻译到其他语言</button>
+        <span class="edit-indicator" id="listingEditIndicator"></span>
+      </div>
+      <div class="tab-bar" id="tabBar"></div>
+      <div class="result-card" id="resultCard">
+        <div id="resultContent"></div>
+      </div>
+    </div>
+    </div><!-- /listingResults -->
+
+    <!-- ===== A+ CONTENT RESULTS ===== -->
+    <div id="aplusResults" style="display:none;">
+      <div class="placeholder-card" id="aplusPlaceholder">
+        <div class="empty-state">
+          <div class="icon">🖼️</div>
+          <h3>A+ Content 生成器</h3>
+          <p>上传产品图片，填写产品信息，AI 将自动生成完整的 A+ Content 品牌页面</p>
+        </div>
+      </div>
+      <div id="aplusResultsContainer" style="display:none;">
+        <div class="edit-toolbar" id="aplusEditToolbar" style="display:none;">
+          <button class="btn btn-secondary btn-sm" id="aplusEditToggle" onclick="toggleAplusEdit()">✏️ 编辑当前版本</button>
+          <button class="btn btn-primary btn-sm" id="aplusSyncBtn" onclick="syncAplusTranslations()" style="display:none;">🔄 同步翻译到其他语言</button>
+          <span class="edit-indicator" id="aplusEditIndicator"></span>
+        </div>
+        <div class="tab-bar" id="aplusTabBar"></div>
+        <div class="result-card" id="aplusResultCard">
+          <div id="aplusResultContent"></div>
+        </div>
+      </div>
+    </div><!-- /aplusResults -->
+
+  </div>
+
+</div>
+
+<!-- Toast Container -->
+<div id="toastContainer"></div>
+
+<script>
+// ==================== 全局状态 ====================
+const STATE = {
+  inputMode: 'url',           // 'url' | 'manual'
+  urlCount: 1,                // URL 输入框数量
+  manualCount: 0,             // 手动竞品数量
+  scrapedData: [],            // 爬取结果
+  generatedResults: {},       // { en: {...}, fr: {...}, ... }
+  activeLang: 'en',
+  isGenerating: false,
+};
+
+const LANG_NAMES = {
+  en: 'English', fr: 'Français', de: 'Deutsch', es: 'Español',
+  it: 'Italiano', ja: '日本語', pt: 'Português', nl: 'Nederlands',
+  pl: 'Polski', sv: 'Svenska', ar: 'العربية', tr: 'Türkçe',
+};
+
+const LANG_NAMES_CN = {
+  en: '英语', fr: '法语', de: '德语', es: '西班牙语',
+  it: '意大利语', ja: '日语', pt: '葡萄牙语', nl: '荷兰语',
+  pl: '波兰语', sv: '瑞典语', ar: '阿拉伯语', tr: '土耳其语',
+  zh: '中文预览',
+};
+
+const LANG_FLAGS = {
+  en: '🇺🇸', fr: '🇫🇷', de: '🇩🇪', es: '🇪🇸',
+  it: '🇮🇹', ja: '🇯🇵', pt: '🇧🇷', nl: '🇳🇱',
+  pl: '🇵🇱', sv: '🇸🇪', ar: '🇦🇪', tr: '🇹🇷',
+  zh: '🇨🇳',
+};
+
+// ==================== 输入模式切换 ====================
+function switchInputMode(mode) {
+  STATE.inputMode = mode;
+  document.querySelectorAll('.input-mode-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.mode === mode);
+  });
+  document.getElementById('urlInputSection').style.display = mode === 'url' ? 'block' : 'none';
+  document.getElementById('manualInputSection').classList.toggle('active', mode === 'manual');
+}
+
+// ==================== URL 输入行管理 ====================
+function addUrlRow() {
+  if (STATE.urlCount >= 5) {
+    showToast('最多添加5个竞品链接', 'warning');
+    return;
+  }
+  STATE.urlCount++;
+  const row = document.createElement('div');
+  row.className = 'url-row';
+  row.innerHTML = `
+    <span class="url-index">#${STATE.urlCount}</span>
+    <input type="url" class="form-input url-input" placeholder="https://www.amazon.com/dp/ASIN">
+    <button class="btn-icon" onclick="removeUrlRow(this)" title="删除">✕</button>
+  `;
+  document.getElementById('urlList').appendChild(row);
+}
+
+function removeUrlRow(btn) {
+  const list = document.getElementById('urlList');
+  if (list.children.length <= 1) return;
+  btn.closest('.url-row').remove();
+  STATE.urlCount--;
+  // 重新编号
+  list.querySelectorAll('.url-index').forEach((el, i) => el.textContent = `#${i + 1}`);
+}
+
+// ==================== 手动粘贴管理 ====================
+function addManualCompetitor() {
+  if (STATE.manualCount >= 5) {
+    showToast('最多添加5个竞品', 'warning');
+    return;
+  }
+  STATE.manualCount++;
+  const container = document.getElementById('manualCompetitors');
+  const card = document.createElement('div');
+  card.className = 'manual-competitor-card';
+  card.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+      <span style="font-weight:700;font-size:13px;color:var(--accent);">竞品 #${STATE.manualCount}</span>
+      <button class="btn-icon" onclick="this.closest('.manual-competitor-card').remove();STATE.manualCount--;" title="删除">✕</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">标题</label>
+      <input type="text" class="form-input manual-title" placeholder="粘贴竞品标题">
+    </div>
+    <div class="form-group">
+      <label class="form-label">五点描述（每行一个）</label>
+      <textarea class="form-textarea manual-bullets" rows="5" placeholder="每行一个卖点"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">产品描述</label>
+      <textarea class="form-textarea manual-desc" rows="6" placeholder="粘贴完整的产品描述"></textarea>
+    </div>
+  `;
+  container.appendChild(card);
+}
+
+// ==================== 语言复选框 ====================
+document.getElementById('langGrid').addEventListener('click', (e) => {
+  const label = e.target.closest('.lang-checkbox');
+  if (!label) return;
+  const cb = label.querySelector('input');
+  cb.checked = !cb.checked;
+  label.classList.toggle('checked', cb.checked);
+});
+
+// ==================== 爬取竞品 ====================
+async function scrapeAllUrls() {
+  const urlInputs = document.querySelectorAll('.url-input');
+  const urls = Array.from(urlInputs).map(i => i.value.trim()).filter(Boolean);
+
+  if (!urls.length) {
+    showToast('请至少输入一个竞品链接', 'warning');
+    return;
+  }
+
+  updateStatus('scraping', '🔍 正在爬取竞品数据...');
+  const resultsDiv = document.getElementById('scrapeResults');
+  resultsDiv.innerHTML = '<div style="padding:12px;text-align:center;color:var(--text-secondary);"><span class="spinner"></span> 正在爬取...</div>';
+
+  let results = [], stats = null;
+  const res = await fetch('/api/scrape-all', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ urls }),
+  });
+  const data = await res.json();
+  
+  // 兼容新旧返回格式
+  if (Array.isArray(data)) {
+    results = data.map(d => ({ ...d, success: d.source === 'scraped' }));
+  } else {
+    results = data.results;
+    stats = data.stats;
+  }
+
+  STATE.scrapedData = results;
+  renderScrapeResults(results, stats);
+
+  const successCount = results.filter(r => r.success).length;
+  if (successCount === results.length) {
+    updateStatus('pending', `✅ 全部爬取成功 (${successCount}/${results.length})`);
+  } else if (successCount > 0) {
+    updateStatus('pending', `⚠️ 部分成功 (${successCount}/${results.length}) — 失败的不会用于AI分析`);
+  } else {
+    updateStatus('pending', '❌ 爬取全部失败 — 请手动粘贴竞品内容或稍后重试');
+    showToast('爬取失败！请切换到手动粘贴或稍后重试', 'error');
+  }
+}
+
+function renderScrapeResults(results, stats) {
+  const div = document.getElementById('scrapeResults');
+  let html = '';
+  
+  // 统计横幅
+  if (stats) {
+    const allOk = stats.success === stats.total;
+    const allFail = stats.success === 0;
+    html += `<div style="padding:8px 12px;margin-bottom:8px;border-radius:8px;font-size:13px;background:${allOk ? 'rgba(46,204,113,0.1)' : allFail ? 'rgba(231,76,60,0.1)' : 'rgba(255,153,0,0.1)'};border:1px solid ${allOk ? 'rgba(46,204,113,0.3)' : allFail ? 'rgba(231,76,60,0.3)' : 'rgba(255,153,0,0.3)'};">
+      ${allOk ? '✅ 全部爬取成功' : allFail ? '❌ 全部爬取失败，请手动粘贴竞品内容' : `⚠️ 部分成功：${stats.success}/${stats.total} 个产品`}
+      ${!allOk ? '<br><span style="font-size:11px;opacity:0.7;">失败的竞品不会参与AI分析</span>' : ''}
+    </div>`;
+  }
+
+  html += results.map((r, i) => {
+    const icon = r.success ? '✅' : '❌';
+    const shortUrl = r.url.length > 60 ? r.url.slice(0, 60) + '...' : r.url;
+    if (r.success) {
+      return `<div class="scrape-item" style="border-left:3px solid var(--success);">
+        <div class="scrape-url">${icon} 竞品 #${i + 1}: ${shortUrl}</div>
+        <div class="scrape-summary">
+          标题: ${(r.title || 'N/A').slice(0, 60)}<br>
+          五点: ${r.bulletPoints?.length || 0} 条 | 描述: ${(r.description || '').length} 字符
+        </div>
+      </div>`;
+    } else {
+      return `<div class="scrape-item" style="border-left:3px solid var(--danger);">
+        <div class="scrape-url">${icon} 竞品 #${i + 1}: ${shortUrl}</div>
+        <div class="scrape-error">⚠️ ${r.error || '爬取失败'} — 不会参与AI分析</div>
+      </div>`;
+    }
+  }).join('');
+  div.innerHTML = html;
+}
+
+// ==================== 收集竞品数据 ====================
+function collectCompetitorData() {
+  if (STATE.inputMode === 'url') {
+    return STATE.scrapedData.filter(d => d.source === 'scraped');
+  } else {
+    const cards = document.querySelectorAll('.manual-competitor-card');
+    const data = [];
+    cards.forEach(card => {
+      const title = card.querySelector('.manual-title')?.value?.trim();
+      const bulletsText = card.querySelector('.manual-bullets')?.value?.trim();
+      const desc = card.querySelector('.manual-desc')?.value?.trim();
+      if (title || bulletsText || desc) {
+        data.push({
+          source: 'manual',
+          title: title || '',
+          bulletPoints: bulletsText ? bulletsText.split('\n').filter(Boolean) : [],
+          description: desc || '',
+        });
+      }
+    });
+    return data;
+  }
+}
+
+// ==================== 生成 Listing ====================
+async function generateAll() {
+  if (STATE.isGenerating) return;
+
+  const productName = document.getElementById('productName').value.trim();
+  const apiKey = document.getElementById('apiKey').value.trim();
+
+  if (!productName) { showToast('请输入产品名称', 'warning'); return; }
+  if (!apiKey) { showToast('请输入 DeepSeek API Key', 'warning'); return; }
+
+  const sellingPoints = document.getElementById('sellingPoints').value.trim();
+  const notes = document.getElementById('notes').value.trim();
+  const competitors = collectCompetitorData();
+
+  // 检查竞品数据是否充足
+  const hasCompetitors = competitors && competitors.length > 0;
+  if (!hasCompetitors && STATE.inputMode === 'url') {
+    const ok = confirm('⚠️ 没有成功爬取到竞品数据！\n\nAI将只能根据你输入的产品名称和卖点来生成内容，无法做竞品差异化分析。\n\n建议：\n• 点击"取消"，切换到"📝 手动粘贴"模式输入竞品内容\n• 或点击"确定"，只用你的产品信息生成\n\n确定要继续吗？');
+    if (!ok) return;
+  }
+
+  // 收集选中的语言
+  const selectedLangs = [];
+  document.querySelectorAll('.lang-checkbox.checked').forEach(label => {
+    selectedLangs.push(label.dataset.lang);
+  });
+  if (!selectedLangs.length) {
+    showToast('请至少选择一个语言版本', 'warning');
+    return;
+  }
+
+  // 确保 English 在第一位
+  if (!selectedLangs.includes('en')) {
+    showToast('English (EN) 必须选中，其他语言基于英文版本翻译', 'warning');
+    return;
+  }
+
+  STATE.isGenerating = true;
+  const btn = document.getElementById('generateBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> 生成中...';
+
+  const progressBar = document.getElementById('progressBar');
+  const progressFill = document.getElementById('progressFill');
+  const progressText = document.getElementById('progressText');
+  progressBar.style.display = 'block';
+  progressFill.style.width = '0%';
+
+  // 显示结果面板
+  document.getElementById('placeholderCard').style.display = 'none';
+  document.getElementById('resultsContainer').style.display = 'block';
+
+  updateStatus('generating', '🤖 DeepSeek v4 Pro 正在生成...');
+
+  try {
+    const res = await fetch('/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        apiKey,
+        productName,
+        sellingPoints,
+        notes,
+        competitors,
+        languages: selectedLangs,
+        charLimits: {
+          titleMin: parseInt(document.getElementById('titleMin').value) || 150,
+          titleMax: parseInt(document.getElementById('titleMax').value) || 200,
+          bulletMin: parseInt(document.getElementById('bulletMin').value) || 150,
+          bulletMax: parseInt(document.getElementById('bulletMax').value) || 250,
+          descMin: parseInt(document.getElementById('descMin').value) || 800,
+          descMax: parseInt(document.getElementById('descMax').value) || 2000,
+        },
+      }),
+    });
+
+    const data = await res.json();
+
+    if (!data.success) {
+      throw new Error(data.error || '生成失败');
+    }
+
+    STATE.generatedResults = data.results;
+
+    // 检查哪些语言成功了
+    const successLangs = Object.keys(data.results).filter(k => !data.results[k].error);
+    const failedLangs = Object.keys(data.results).filter(k => data.results[k].error);
+
+    // 构建 tab 列表（按选中顺序）+ 中文预览
+    const orderedLangs = selectedLangs.filter(l => successLangs.includes(l));
+    if (data.results['zh'] && !data.results['zh'].error && !orderedLangs.includes('zh')) {
+      orderedLangs.push('zh');
+    }
+    STATE.activeLang = orderedLangs[0] || 'en';
+
+    // 渲染 tabs 和内容
+    renderTabs(orderedLangs);
+    renderResult(STATE.activeLang);
+
+    // 更新进度
+    progressFill.style.width = '100%';
+
+    if (failedLangs.length) {
+      updateStatus('done', `⚠️ 部分完成 (${successLangs.length}/${selectedLangs.length} 语言)`);
+      showToast(`${failedLangs.length} 个语言版本生成失败: ${failedLangs.map(l => LANG_NAMES_CN[l]||l).join(', ')}`, 'warning');
+    } else {
+      updateStatus('done', '✅ 全部生成完成！');
+      showToast('🎉 Listing 内容生成成功！', 'success');
+    }
+  } catch (err) {
+    updateStatus('error', '❌ 生成失败');
+    showToast(`生成失败: ${err.message}`, 'error');
+    document.getElementById('placeholderCard').style.display = '';
+    document.getElementById('resultsContainer').style.display = 'none';
+  } finally {
+    STATE.isGenerating = false;
+    btn.disabled = false;
+    btn.innerHTML = '🚀 开始生成 Listing';
+    progressText.textContent = '';
+    setTimeout(() => { progressBar.style.display = 'none'; }, 2000);
+  }
+}
+
+// ==================== 渲染 Tabs ====================
+function renderTabs(langs) {
+  const tabBar = document.getElementById('tabBar');
+  tabBar.innerHTML = langs.map(lang => `
+    <button class="tab-btn ${lang === STATE.activeLang ? 'active' : ''}"
+            onclick="switchTab('${lang}')">
+      ${LANG_FLAGS[lang] || '🌐'} ${LANG_NAMES_CN[lang] || LANG_NAMES[lang] || lang}
+    </button>
+  `).join('');
+}
+
+function switchTab(lang) {
+  STATE.activeLang = lang;
+  const targetName = LANG_NAMES_CN[lang] || LANG_NAMES[lang] || lang;
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.textContent.includes(targetName));
+  });
+  renderResult(lang);
+}
+
+// ==================== 渲染结果 ====================
+function renderResult(lang) {
+  const container = document.getElementById('resultContent');
+  const data = STATE.generatedResults[lang];
+  const isEdit = listingEditMode;
+
+  // Show/hide edit toolbar
+  document.getElementById('listingEditToolbar').style.display = 'flex';
+
+  if (!data || data.error) {
+    container.innerHTML = `
+      <div class="empty-state" style="padding:40px;">
+        <div class="icon">⚠️</div>
+        <h3>生成失败</h3>
+        <p>${data?.error || '未知错误'}</p>
+      </div>`;
+    return;
+  }
+
+  const title = data.title || '';
+  const bullets = data.bulletPoints || [];
+  const description = data.description || '';
+
+  if (isEdit) {
+    container.innerHTML = `
+      <div class="result-section">
+        <div class="result-section-header"><span class="result-section-title">📌 产品标题</span><span class="char-count" id="edit-title-count">${title.length} 字符</span></div>
+        <input class="edit-input" id="edit-title" value="${escapeAttr(title)}" oninput="document.getElementById('edit-title-count').textContent=this.value.length+' 字符'">
+      </div>
+      <div class="result-section">
+        <div class="result-section-header"><span class="result-section-title">📝 五点描述</span></div>
+        ${[0,1,2,3,4].map(i => `
+          <div style="margin-bottom:8px;display:flex;gap:8px;align-items:flex-start;">
+            <span style="color:var(--accent);font-weight:700;min-width:20px;padding-top:8px;">${i+1}.</span>
+            <textarea class="edit-textarea" id="edit-bullet-${i}" rows="3" style="min-height:50px;">${escapeHtml(bullets[i] || '')}</textarea>
+          </div>
+        `).join('')}
+      </div>
+      <div class="result-section">
+        <div class="result-section-header"><span class="result-section-title">📄 产品描述</span><span class="char-count" id="edit-desc-count">${description.length} 字符</span></div>
+        <textarea class="edit-textarea" id="edit-desc" rows="12" oninput="document.getElementById('edit-desc-count').textContent=this.value.length+' 字符'">${escapeHtml(description)}</textarea>
+      </div>
+    `;
+  } else {
+    container.innerHTML = `
+      <div class="result-section">
+        <div class="result-section-header">
+          <span class="result-section-title">📌 产品标题</span>
+          <span><span class="char-count" style="display:inline;margin-right:8px;">${title.length} 字符</span><button class="btn-copy" onclick="copyText('title-${lang}')">📋 复制</button></span>
+        </div>
+        <div class="result-content title-content" id="title-${lang}">${escapeHtml(title)}</div>
+      </div>
+      <div class="result-section">
+        <div class="result-section-header">
+          <span class="result-section-title">📝 五点描述</span>
+          <button class="btn-copy" onclick="copyText('bullets-${lang}')">📋 复制全部</button>
+        </div>
+        <div class="result-content" id="bullets-${lang}">
+          <ul>${bullets.map((b, i) => `<li>${escapeHtml(b)} <span class="char-count" style="display:inline;margin-left:8px;">(${b.length}字符)</span></li>`).join('')}</ul>
+        </div>
+      </div>
+      <div class="result-section">
+        <div class="result-section-header">
+          <span class="result-section-title">📄 产品描述</span>
+          <span><span class="char-count" style="display:inline;margin-right:8px;">${description.length} 字符</span><button class="btn-copy" onclick="copyText('desc-${lang}')">📋 复制</button></span>
+        </div>
+        <div class="result-content description-content" id="desc-${lang}">${description}</div>
+      </div>
+    `;
+  }
+}
+
+// ==================== 复制功能 ====================
+function copyText(elementId) {
+  const el = document.getElementById(elementId);
+  if (!el) return;
+
+  // 产品描述复制 HTML 源码，标题和五点复制纯文本
+  const isDesc = elementId.startsWith('desc-');
+  const text = isDesc ? el.innerHTML : (el.innerText || el.textContent);
+
+  navigator.clipboard.writeText(text).then(() => {
+    const section = el.closest('.result-section');
+    const btn = section?.querySelector('.btn-copy');
+    if (btn) {
+      btn.textContent = '✅ 已复制';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = '📋 复制';
+        btn.classList.remove('copied');
+      }, 2000);
+    }
+    showToast(isDesc ? '已复制HTML源码到剪贴板' : '已复制到剪贴板', 'success');
+  }).catch(() => {
+    showToast('复制失败，请手动选择', 'error');
+  });
+}
+
+// ==================== 工具函数 ====================
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML.replace(/\n/g, '<br>');
+}
+
+function updateStatus(type, message) {
+  const badge = document.getElementById('statusBadge');
+  const icons = { scraping: '🔍', generating: '🤖', done: '✅', error: '❌', pending: '●' };
+  badge.innerHTML = `<span class="status-${type}">${type === 'scraping' || type === 'generating' ? '<span class="spinner"></span>' : ''} ${message}</span>`;
+}
+
+function showToast(message, type) {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  if (type === 'error') toast.style.borderColor = 'var(--danger)';
+  if (type === 'warning') toast.style.borderColor = 'var(--accent)';
+  if (type === 'error') toast.style.color = 'var(--danger)';
+  if (type === 'warning') toast.style.color = 'var(--accent)';
+  toast.textContent = message;
+  container.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
+
+// ==================== EDIT MODE: LISTING ====================
+let listingEditMode = false;
+
+function toggleListingEdit() {
+  listingEditMode = !listingEditMode;
+  const btn = document.getElementById('listingEditToggle');
+  const syncBtn = document.getElementById('listingSyncBtn');
+  const indicator = document.getElementById('listingEditIndicator');
+  if (listingEditMode) {
+    btn.textContent = '👁️ 退出编辑';
+    btn.style.borderColor = 'var(--success)';
+    btn.style.color = 'var(--success)';
+    syncBtn.style.display = 'inline-flex';
+    indicator.textContent = '● 编辑中 — 完成后点「同步翻译」';
+  } else {
+    btn.textContent = '✏️ 编辑当前版本';
+    btn.style.borderColor = '';
+    btn.style.color = '';
+    syncBtn.style.display = 'none';
+    indicator.textContent = '';
+  }
+  renderResult(STATE.activeLang);
+}
+
+async function syncListingTranslations() {
+  const lang = STATE.activeLang;
+  const allLangs = Object.keys(STATE.generatedResults).filter(k => !STATE.generatedResults[k].error);
+  const targetLangs = allLangs.filter(l => l !== lang);
+  if (!targetLangs.length) { showToast('没有其他语言版本可同步', 'warning'); return; }
+  let edited;
+  if (lang === 'zh') {
+    const title = document.getElementById('edit-title')?.value?.trim() || '';
+    const bullets = [];
+    for (let i = 0; i < 5; i++) {
+      const b = document.getElementById('edit-bullet-' + i)?.value?.trim();
+      if (b) bullets.push(b);
+    }
+    const desc = document.getElementById('edit-desc')?.value?.trim() || '';
+    edited = { title, bulletPoints: bullets, description: desc };
+  } else {
+    edited = { ...STATE.generatedResults[lang] };
+    const title = document.getElementById('edit-title')?.value?.trim();
+    if (title) edited.title = title;
+    const bullets = [];
+    for (let i = 0; i < 5; i++) {
+      const b = document.getElementById('edit-bullet-' + i)?.value?.trim();
+      if (b) bullets.push(b);
+    }
+    if (bullets.length) edited.bulletPoints = bullets;
+    const desc = document.getElementById('edit-desc')?.value?.trim();
+    if (desc) edited.description = desc;
+  }
+  const syncBtn = document.getElementById('listingSyncBtn');
+  syncBtn.disabled = true;
+  syncBtn.innerHTML = '<span class="spinner"></span> 同步中...';
+  try {
+    const res = await fetch('/api/sync-translations', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        apiKey: document.getElementById('apiKey').value.trim(),
+        sourceLang: lang, sourceContent: edited, targetLangs, mode: 'listing',
+      }),
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error);
+    Object.assign(STATE.generatedResults, data.results);
+    showToast('✅ 已同步到 ' + targetLangs.length + ' 个语言版本', 'success');
+    renderTabs(allLangs);
+    listingEditMode = false;
+    toggleListingEdit();
+    renderResult(STATE.activeLang);
+  } catch (err) {
+    showToast('同步失败: ' + err.message, 'error');
+  } finally {
+    syncBtn.disabled = false;
+    syncBtn.innerHTML = '🔄 同步翻译到其他语言';
+  }
+}
+
+// ==================== EDIT MODE: A+ CONTENT ====================
+let aplusEditMode = false;
+
+function toggleAplusEdit() {
+  aplusEditMode = !aplusEditMode;
+  const btn = document.getElementById('aplusEditToggle');
+  const syncBtn = document.getElementById('aplusSyncBtn');
+  const indicator = document.getElementById('aplusEditIndicator');
+  if (aplusEditMode) {
+    btn.textContent = '👁️ 退出编辑';
+    btn.style.borderColor = 'var(--success)';
+    btn.style.color = 'var(--success)';
+    syncBtn.style.display = 'inline-flex';
+    indicator.textContent = '● 编辑中';
+  } else {
+    btn.textContent = '✏️ 编辑当前版本';
+    btn.style.borderColor = '';
+    btn.style.color = '';
+    syncBtn.style.display = 'none';
+    indicator.textContent = '';
+  }
+  renderAplusResult(STATE.aplusActiveLang);
+}
+
+async function syncAplusTranslations() {
+  const lang = STATE.aplusActiveLang;
+  const allLangs = Object.keys(STATE.generatedResults).filter(k => !STATE.generatedResults[k].error);
+  const targetLangs = allLangs.filter(l => l !== lang);
+  if (!targetLangs.length) { showToast('没有其他语言版本可同步', 'warning'); return; }
+  const edited = collectAplusEdited();
+  const syncBtn = document.getElementById('aplusSyncBtn');
+  syncBtn.disabled = true;
+  syncBtn.innerHTML = '<span class="spinner"></span> 同步中...';
+  try {
+    const res = await fetch('/api/sync-translations', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        apiKey: document.getElementById('apiKey').value.trim(),
+        sourceLang: lang, sourceContent: edited, targetLangs, mode: 'aplus',
+      }),
+    });
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error);
+    Object.assign(STATE.generatedResults, data.results);
+    showToast('✅ 已同步到 ' + targetLangs.length + ' 个版本', 'success');
+    renderAplusTabs(allLangs);
+    aplusEditMode = false;
+    toggleAplusEdit();
+    renderAplusResult(STATE.aplusActiveLang);
+  } catch (err) {
+    showToast('同步失败: ' + err.message, 'error');
+  } finally {
+    syncBtn.disabled = false;
+    syncBtn.innerHTML = '🔄 同步翻译到其他语言';
+  }
+}
+
+function collectAplusEdited() {
+  const bsHeadline = document.getElementById('edit-bs-headline')?.value?.trim() || '';
+  const bsBody = document.getElementById('edit-bs-body')?.value?.trim() || '';
+  const imageModules = [];
+  for (let i = 0; i < 10; i++) {
+    const hl = document.getElementById('edit-img-headline-' + i)?.value?.trim();
+    const bd = document.getElementById('edit-img-body-' + i)?.value?.trim();
+    if (!hl && !bd) break;
+    imageModules.push({ headline: hl, body: bd, moduleType: 'image_with_text_overlay' });
+  }
+  const featureItems = [];
+  for (let i = 0; i < 10; i++) {
+    const icon = document.getElementById('edit-fh-icon-' + i)?.value?.trim();
+    const hl = document.getElementById('edit-fh-headline-' + i)?.value?.trim();
+    const d = document.getElementById('edit-fh-desc-' + i)?.value?.trim();
+    if (!hl && !d) break;
+    featureItems.push({ icon: icon || '✅', headline: hl, description: d });
+  }
+  return {
+    brandStory: { headline: bsHeadline, body: bsBody },
+    imageModules,
+    featureHighlights: { sectionTitle: '', items: featureItems },
+    comparisonChart: (STATE.generatedResults[STATE.aplusActiveLang] || {}).comparisonChart || {},
+    technicalSpecs: (STATE.generatedResults[STATE.aplusActiveLang] || {}).technicalSpecs || {},
+  };
+}
+
+// ==================== 页面加载初始化 ====================
+// 预创建一个手动竞品卡片
+addManualCompetitor();
+// 重置手动计数（预创建的不算）
+STATE.manualCount = 1;
+
+// ==================== MODE SWITCHING ====================
+let currentMode = 'listing';
+
+function switchMode(mode) {
+  currentMode = mode;
+  document.querySelectorAll('.mode-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.mode === mode);
+  });
+
+  const listingInputs = document.getElementById('listingInputs');
+  const aplusInputs = document.getElementById('aplusInputs');
+  const reviewInputs = document.getElementById('reviewInputs');
+  const listingResults = document.getElementById('listingResults');
+  const aplusResults = document.getElementById('aplusResults');
+  const reviewResults = document.getElementById('reviewResults');
+  const generateBtn = document.getElementById('generateBtn');
+  const reviewAnalyzeBtn = document.getElementById('reviewAnalyzeBtn');
+
+  if (mode === 'aplus') {
+    listingInputs.style.display = 'none';
+    reviewInputs.style.display = 'none';
+    aplusInputs.style.display = 'block';
+    listingResults.style.display = 'none';
+    reviewResults.style.display = 'none';
+    aplusResults.style.display = 'block';
+    generateBtn.style.display = '';
+    reviewAnalyzeBtn.style.display = 'none';
+    generateBtn.textContent = '🎨 生成 A+ Content';
+    generateBtn.onclick = generateAplus;
+  } else if (mode === 'reviews') {
+    listingInputs.style.display = 'none';
+    aplusInputs.style.display = 'none';
+    reviewInputs.style.display = 'block';
+    listingResults.style.display = 'none';
+    aplusResults.style.display = 'none';
+    reviewResults.style.display = 'block';
+    generateBtn.style.display = 'none';
+    reviewAnalyzeBtn.style.display = '';
+  } else {
+    listingInputs.style.display = 'block';
+    aplusInputs.style.display = 'none';
+    reviewInputs.style.display = 'none';
+    listingResults.style.display = 'block';
+    aplusResults.style.display = 'none';
+    reviewResults.style.display = 'none';
+    generateBtn.style.display = '';
+    reviewAnalyzeBtn.style.display = 'none';
+    generateBtn.textContent = '🚀 开始生成 Listing';
+    generateBtn.onclick = generateAll;
+  }
+}
+
+// ==================== A+ CONTENT: IMAGE UPLOAD ====================
+let visionMode = 'ds';
+let uploadedImages = [];
+
+function switchVisionMode(mode) {
+  visionMode = mode;
+  document.querySelectorAll('[data-vision]').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.vision === mode);
+  });
+  document.getElementById('openaiKeyGroup').style.display = mode === 'openai' ? 'block' : 'none';
+  document.getElementById('dsLabelHint').style.display = mode === 'ds' ? 'block' : 'none';
+  if (mode === 'ds') {
+    document.getElementById('imagePreviewList').querySelectorAll('input').forEach(inp => {
+      inp.placeholder = '图片描述（必填）';
+    });
+  } else {
+    document.getElementById('imagePreviewList').querySelectorAll('input').forEach(inp => {
+      inp.placeholder = '图片描述（可选，AI自动识别）';
+    });
+  }
+}
+
+// Drag & drop
+const uploadZone = document.getElementById('uploadZone');
+uploadZone.addEventListener('dragover', e => { e.preventDefault(); uploadZone.classList.add('dragover'); });
+uploadZone.addEventListener('dragleave', () => { uploadZone.classList.remove('dragover'); });
+uploadZone.addEventListener('drop', e => {
+  e.preventDefault();
+  uploadZone.classList.remove('dragover');
+  uploadImages(e.dataTransfer.files);
+});
+
+function handleImageSelect(event) {
+  uploadImages(event.target.files);
+  event.target.value = '';
+}
+
+async function uploadImages(fileList) {
+  if (!fileList.length) return;
+  if (uploadedImages.length + fileList.length > 10) {
+    showToast('最多上传10张图片', 'warning');
+    return;
+  }
+
+  const formData = new FormData();
+  for (const file of fileList) {
+    formData.append('images', file);
+  }
+
+  try {
+    const res = await fetch('/api/upload-images', { method: 'POST', body: formData });
+    const data = await res.json();
+    if (data.success) {
+      uploadedImages.push(...data.files.map(f => ({ ...f, label: '' })));
+      renderImagePreviews();
+      showToast(`已上传 ${data.files.length} 张图片`, 'success');
+    }
+  } catch (err) {
+    showToast('上传失败: ' + err.message, 'error');
+  }
+}
+
+function renderImagePreviews() {
+  const container = document.getElementById('imagePreviewList');
+  container.innerHTML = uploadedImages.map((img, i) => `
+    <div class="image-preview-card">
+      <img src="${img.url}" alt="Image ${i + 1}">
+      <button class="img-remove" onclick="removeImage(${i})">✕</button>
+      <div class="img-label">
+        <input type="text" placeholder="图片描述（可选）" value="${escapeAttr(img.label)}"
+               onchange="updateImageLabel(${i}, this.value)">
+      </div>
+    </div>
+  `).join('');
+}
+
+function removeImage(index) {
+  uploadedImages.splice(index, 1);
+  renderImagePreviews();
+}
+
+function updateImageLabel(index, label) {
+  uploadedImages[index].label = label;
+}
+
+function escapeAttr(str) {
+  return (str || '').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+// ==================== A+ CONTENT: COMPETITOR MANAGEMENT ====================
+let aplusCompMode = 'url';
+let aplusUrlCount = 1;
+let aplusScrapedData = [];
+let aplusCompetitorCount = 0;
+
+function switchAplusCompMode(mode) {
+  aplusCompMode = mode;
+  document.querySelectorAll('#aplusInputs .input-mode-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.mode === mode);
+  });
+  document.getElementById('aplusUrlSection').style.display = mode === 'url' ? 'block' : 'none';
+  document.getElementById('aplusManualSection').classList.toggle('active', mode === 'manual');
+}
+
+function addAplusUrlRow() {
+  if (aplusUrlCount >= 5) { showToast('最多添加5个竞品链接', 'warning'); return; }
+  aplusUrlCount++;
+  const row = document.createElement('div');
+  row.className = 'url-row';
+  row.innerHTML = `
+    <span class="url-index">#${aplusUrlCount}</span>
+    <input type="url" class="form-input aplus-url-input" placeholder="https://www.amazon.com/dp/ASIN">
+    <button class="btn-icon" onclick="removeAplusUrlRow(this)" title="删除">✕</button>
+  `;
+  document.getElementById('aplusUrlList').appendChild(row);
+}
+
+function removeAplusUrlRow(btn) {
+  const list = document.getElementById('aplusUrlList');
+  if (list.children.length <= 1) return;
+  btn.closest('.url-row').remove();
+  aplusUrlCount--;
+  list.querySelectorAll('.url-index').forEach((el, i) => el.textContent = `#${i + 1}`);
+}
+
+async function scrapeAplusUrls() {
+  const urlInputs = document.querySelectorAll('.aplus-url-input');
+  const urls = Array.from(urlInputs).map(i => i.value.trim()).filter(Boolean);
+  if (!urls.length) { showToast('请至少输入一个竞品链接', 'warning'); return; }
+
+  updateStatus('scraping', '🔍 正在爬取竞品数据...');
+  const resultsDiv = document.getElementById('aplusScrapeResults');
+  resultsDiv.innerHTML = '<div style="padding:12px;text-align:center;color:var(--text-secondary);"><span class="spinner"></span> 正在爬取...</div>';
+
+  const results = [];
+  for (const url of urls) {
+    try {
+      const res = await fetch('/api/scrape', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url }) });
+      results.push(await res.json());
+    } catch (err) {
+      results.push({ url, source: 'error', error: err.message });
+    }
+  }
+
+  aplusScrapedData = results;
+  resultsDiv.innerHTML = results.map((r, i) => `
+    <div class="scrape-item">
+      <div class="scrape-url">📋 竞品 #${i + 1}: ${r.url}</div>
+      ${r.source === 'scraped' ? `
+        <div class="scrape-summary">✅ 标题: ${(r.title || 'N/A').slice(0, 80)}... | 五点: ${r.bulletPoints?.length || 0} 条 | 描述: ${(r.description || '').length} 字符</div>
+      ` : `<div class="scrape-error">⚠️ ${r.error || '未知错误'}</div>`}
+    </div>
+  `).join('');
+
+  const ok = results.filter(r => r.source === 'scraped').length;
+  if (ok === results.length) updateStatus('pending', `✅ 成功爬取 ${ok} 个竞品`);
+  else if (ok > 0) updateStatus('pending', `⚠️ 部分成功 (${ok}/${results.length})`);
+  else updateStatus('pending', '❌ 爬取失败，请尝试手动粘贴');
+}
+
+function addAplusCompetitor() {
+  if (aplusCompetitorCount >= 5) { showToast('最多添加5个竞品', 'warning'); return; }
+  aplusCompetitorCount++;
+  const container = document.getElementById('aplusManualCompetitors');
+  const card = document.createElement('div');
+  card.className = 'manual-competitor-card';
+  card.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+      <span style="font-weight:700;font-size:13px;color:var(--accent);">竞品 #${aplusCompetitorCount}</span>
+      <button class="btn-icon" onclick="this.closest('.manual-competitor-card').remove();aplusCompetitorCount--;">✕</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">标题</label>
+      <input type="text" class="form-input aplus-comp-title" placeholder="竞品标题">
+    </div>
+    <div class="form-group">
+      <label class="form-label">五点描述（每行一个）</label>
+      <textarea class="form-textarea aplus-comp-bullets" rows="4" placeholder="每行一个卖点"></textarea>
+    </div>
+    <div class="form-group">
+      <label class="form-label">产品描述</label>
+      <textarea class="form-textarea aplus-comp-desc" rows="4" placeholder="粘贴产品描述"></textarea>
+    </div>
+  `;
+  container.appendChild(card);
+}
+
+function collectAplusCompetitors() {
+  if (aplusCompMode === 'url') {
+    return aplusScrapedData.filter(d => d.source === 'scraped');
+  } else {
+    const cards = document.querySelectorAll('#aplusManualCompetitors .manual-competitor-card');
+    const data = [];
+    cards.forEach(card => {
+      const title = card.querySelector('.aplus-comp-title')?.value?.trim();
+      const bulletsText = card.querySelector('.aplus-comp-bullets')?.value?.trim();
+      const desc = card.querySelector('.aplus-comp-desc')?.value?.trim();
+      if (title || bulletsText || desc) {
+        data.push({
+          source: 'manual',
+          title: title || '',
+          bulletPoints: bulletsText ? bulletsText.split('\n').filter(Boolean) : [],
+          description: desc || '',
+        });
+      }
+    });
+    return data;
+  }
+}
+
+// ==================== A+ CONTENT: LANGUAGE MANAGEMENT ====================
+const APLUS_EXTRA_LANGS = [
+  { code: 'pl', flag: '🇵🇱', name: '波兰语' },
+  { code: 'sv', flag: '🇸🇪', name: '瑞典语' },
+  { code: 'ar', flag: '🇦🇪', name: '阿拉伯语' },
+  { code: 'tr', flag: '🇹🇷', name: '土耳其语' },
+];
+let aplusExtraLangAdded = false;
+
+function addAplusLang() {
+  if (aplusExtraLangAdded) { showToast('已添加额外语言', 'warning'); return; }
+  aplusExtraLangAdded = true;
+  const grid = document.getElementById('aplusLangGrid');
+  APLUS_EXTRA_LANGS.forEach(lang => {
+    const label = document.createElement('label');
+    label.className = 'lang-checkbox';
+    label.dataset.lang = lang.code;
+    label.innerHTML = `
+      <input type="checkbox"> <span class="flag">${lang.flag}</span> ${lang.name} <span class="code">${lang.code.toUpperCase()}</span>
+    `;
+    label.addEventListener('click', function(e) {
+      if (e.target.tagName === 'INPUT') return;
+      const cb = this.querySelector('input');
+      cb.checked = !cb.checked;
+      this.classList.toggle('checked', cb.checked);
+    });
+    grid.appendChild(label);
+  });
+}
+
+// A+ language checkboxes toggle
+document.getElementById('aplusLangGrid').addEventListener('click', (e) => {
+  const label = e.target.closest('.lang-checkbox');
+  if (!label) return;
+  if (e.target.tagName === 'INPUT') return;
+  const cb = label.querySelector('input');
+  cb.checked = !cb.checked;
+  label.classList.toggle('checked', cb.checked);
+});
+
+function getSelectedAplusLangs() {
+  const langs = [];
+  document.querySelectorAll('#aplusLangGrid .lang-checkbox.checked').forEach(label => {
+    langs.push(label.dataset.lang);
+  });
+  return langs;
+}
+
+// ==================== A+ CONTENT: SCRAPE PRODUCT ====================
+async function scrapeAplusProduct() {
+  const url = document.getElementById('aplusProductUrl').value.trim();
+  if (!url) { showToast('请输入产品页面链接', 'warning'); return; }
+
+  const statusEl = document.getElementById('aplusScrapeStatus');
+  statusEl.innerHTML = '<span class="spinner"></span> 爬取中...';
+
+  try {
+    const res = await fetch('/api/scrape', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url }),
+    });
+    const data = await res.json();
+    if (data.title) {
+      const nameInput = document.getElementById('aplusProductName');
+      if (!nameInput.value.trim()) nameInput.value = data.title;
+      const spInput = document.getElementById('aplusSellingPoints');
+      if (data.bulletPoints?.length && !spInput.value.trim()) {
+        spInput.value = data.bulletPoints.slice(0, 5).join('\n');
+      }
+      statusEl.innerHTML = '✅ 爬取成功，已自动填入产品信息';
+      statusEl.style.color = 'var(--success)';
+    } else {
+      statusEl.innerHTML = '⚠️ ' + (data.error || '未能提取内容，请手动输入');
+      statusEl.style.color = 'var(--accent)';
+    }
+  } catch (err) {
+    statusEl.innerHTML = '❌ 爬取失败: ' + err.message;
+    statusEl.style.color = 'var(--danger)';
+  }
+}
+
+// ==================== A+ CONTENT: GENERATION ====================
+async function generateAplus() {
+  if (STATE.isGenerating) return;
+
+  const productName = document.getElementById('aplusProductName').value.trim();
+  const apiKey = document.getElementById('apiKey').value.trim();
+
+  if (!productName) { showToast('请输入产品名称', 'warning'); return; }
+  if (!apiKey) { showToast('请输入 DeepSeek API Key', 'warning'); return; }
+
+  const sellingPoints = document.getElementById('aplusSellingPoints').value.trim();
+  const notes = '';
+  const productUrl = document.getElementById('aplusProductUrl').value.trim();
+  const competitors = collectAplusCompetitors();
+  const selectedLangs = getSelectedAplusLangs();
+  const openaiApiKey = document.getElementById('openaiApiKey').value.trim();
+
+  if (!selectedLangs.length) { showToast('请至少选择一个语言版本', 'warning'); return; }
+  if (!selectedLangs.includes('en')) { showToast('English (EN) 必须选中', 'warning'); return; }
+
+  // Validate image labels when using DeepSeek
+  if (visionMode === 'ds' && uploadedImages.length > 0) {
+    const unlabeled = uploadedImages.filter(img => !img.label || !img.label.trim());
+    if (unlabeled.length > 0) {
+      showToast(`DeepSeek 模式下请为每张图片填写描述（${unlabeled.length} 张未填写）`, 'warning');
+      return;
+    }
+  }
+
+  // Validate OpenAI key when using GPT-4o Vision
+  if (visionMode === 'openai' && uploadedImages.length > 0 && !openaiApiKey) {
+    showToast('请填写 OpenAI API Key 以使用视觉识别', 'warning');
+    return;
+  }
+
+  STATE.isGenerating = true;
+  const btn = document.getElementById('generateBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> 生成中...';
+
+  document.getElementById('progressBar').style.display = 'block';
+  document.getElementById('progressFill').style.width = '0%';
+  document.getElementById('aplusPlaceholder').style.display = 'none';
+  document.getElementById('aplusResultsContainer').style.display = 'block';
+
+  updateStatus('generating', visionMode === 'openai' && uploadedImages.length ? '👁️ 正在分析图片...' : '🤖 正在生成 A+ Content...');
+
+  try {
+    const res = await fetch('/api/generate-aplus', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        apiKey, productName, sellingPoints, notes, productUrl, competitors,
+        images: uploadedImages,
+        languages: selectedLangs,
+        visionModel: visionMode,
+        visionApiKey: visionMode === 'openai' ? openaiApiKey : undefined,
+      }),
+    });
+
+    const data = await res.json();
+    if (!data.success) throw new Error(data.error || '生成失败');
+
+    STATE.generatedResults = data.results;
+    const successLangs = Object.keys(data.results).filter(k => !data.results[k].error);
+    const failedLangs = Object.keys(data.results).filter(k => data.results[k].error);
+    const orderedLangs = selectedLangs.filter(l => successLangs.includes(l));
+    if (data.results['zh'] && !data.results['zh'].error && !orderedLangs.includes('zh')) {
+      orderedLangs.push('zh');
+    }
+    STATE.aplusActiveLang = orderedLangs[0] || 'en';
+
+    renderAplusTabs(orderedLangs);
+    renderAplusResult(STATE.aplusActiveLang);
+
+    document.getElementById('progressFill').style.width = '100%';
+
+    if (failedLangs.length) {
+      updateStatus('done', `⚠️ 部分完成 (${successLangs.length}/${selectedLangs.length})`);
+    } else {
+      updateStatus('done', '✅ A+ Content 生成完成！');
+      showToast('🎉 A+ Content 生成成功！', 'success');
+    }
+  } catch (err) {
+    updateStatus('error', '❌ 生成失败');
+    showToast('生成失败: ' + err.message, 'error');
+    document.getElementById('aplusPlaceholder').style.display = '';
+    document.getElementById('aplusResultsContainer').style.display = 'none';
+  } finally {
+    STATE.isGenerating = false;
+    btn.disabled = false;
+    btn.textContent = '🎨 生成 A+ Content';
+    document.getElementById('progressText').textContent = '';
+    setTimeout(() => { document.getElementById('progressBar').style.display = 'none'; }, 2000);
+  }
+}
+
+// ==================== A+ CONTENT: RENDER RESULTS ====================
+STATE.aplusActiveLang = 'en';
+
+function renderAplusTabs(langs) {
+  const tabBar = document.getElementById('aplusTabBar');
+  tabBar.innerHTML = langs.map(lang => `
+    <button class="tab-btn ${lang === STATE.aplusActiveLang ? 'active' : ''}"
+            onclick="switchAplusTab('${lang}')">
+      ${LANG_FLAGS[lang] || '🌐'} ${LANG_NAMES_CN[lang] || LANG_NAMES[lang] || lang}
+    </button>
+  `).join('');
+}
+
+function switchAplusTab(lang) {
+  STATE.aplusActiveLang = lang;
+  const name = LANG_NAMES_CN[lang] || LANG_NAMES[lang] || lang;
+  document.querySelectorAll('#aplusTabBar .tab-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.textContent.includes(name));
+  });
+  renderAplusResult(lang);
+}
+
+function renderAplusResult(lang) {
+  const container = document.getElementById('aplusResultContent');
+  const data = STATE.generatedResults[lang];
+  const isEdit = aplusEditMode;
+
+  document.getElementById('aplusEditToolbar').style.display = 'flex';
+
+  if (!data || data.error) {
+    container.innerHTML = `<div class="empty-state" style="padding:40px;"><div class="icon">⚠️</div><h3>生成失败</h3><p>${data?.error || '未知错误'}</p></div>`;
+    return;
+  }
+
+  if (isEdit) {
+    let html = '';
+    if (data.brandStory) {
+      html += `<div class="aplus-module"><div class="aplus-module-header"><span class="aplus-module-type">🏷️ 品牌故事</span></div>`;
+      html += `<label style="font-size:11px;color:var(--text-secondary);">标题</label><input class="edit-input" id="edit-bs-headline" value="${escapeAttr(data.brandStory.headline || '')}">`;
+      html += `<label style="font-size:11px;color:var(--text-secondary);margin-top:8px;display:block;">内容</label><textarea class="edit-textarea" id="edit-bs-body" rows="6">${escapeHtml(data.brandStory.body || '')}</textarea>`;
+      html += `</div>`;
+    }
+    if (data.imageModules) {
+      data.imageModules.forEach((mod, i) => {
+        html += `<div class="aplus-module"><div class="aplus-module-header"><span class="aplus-module-type">📸 图片 #${i+1}</span></div>`;
+        html += `<label style="font-size:11px;color:var(--text-secondary);">标题</label><input class="edit-input" id="edit-img-headline-${i}" value="${escapeAttr(mod.headline || '')}">`;
+        html += `<label style="font-size:11px;color:var(--text-secondary);margin-top:8px;display:block;">内容</label><textarea class="edit-textarea" id="edit-img-body-${i}" rows="4">${escapeHtml(mod.body || '')}</textarea>`;
+        html += `</div>`;
+      });
+    }
+    if (data.featureHighlights?.items) {
+      html += `<div class="aplus-module"><div class="aplus-module-header"><span class="aplus-module-type">✨ 产品亮点</span></div>`;
+      data.featureHighlights.items.forEach((item, i) => {
+        html += `<div style="margin-bottom:12px;padding:8px;background:#0a0b0e;border-radius:6px;">`;
+        html += `<div style="display:flex;gap:8px;">`;
+        html += `<input class="edit-input" id="edit-fh-icon-${i}" value="${escapeAttr(item.icon || '')}" style="width:60px;" placeholder="icon">`;
+        html += `<input class="edit-input" id="edit-fh-headline-${i}" value="${escapeAttr(item.headline || '')}" placeholder="headline">`;
+        html += `</div>`;
+        html += `<textarea class="edit-textarea" id="edit-fh-desc-${i}" rows="2" style="margin-top:4px;min-height:40px;">${escapeHtml(item.description || '')}</textarea>`;
+        html += `</div>`;
+      });
+      html += `</div>`;
+    }
+    container.innerHTML = html;
+  } else {
+    let html = '';
+    if (data.brandStory) {
+      html += `<div class="aplus-module"><div class="aplus-module-header"><span class="aplus-module-type">🏷️ 品牌故事</span><button class="btn-copy" onclick="copyAplusText('aplus-bs-${lang}')">📋 复制</button></div><div class="aplus-module-title">${escapeHtml(data.brandStory.headline || '')}</div><div class="aplus-module-body" id="aplus-bs-${lang}">${escapeHtml(data.brandStory.body || '')}</div></div>`;
+    }
+    if (data.imageModules && data.imageModules.length) {
+      html += `<div class="card-title"><span class="icon">🖼️</span> 图片内容模块</div>`;
+      data.imageModules.forEach((mod, i) => {
+        const img = uploadedImages[i];
+        html += `<div class="aplus-module"><div class="aplus-module-header"><span class="aplus-module-type">📸 图片 #${i+1}</span><button class="btn-copy" onclick="copyAplusText('aplus-img-${lang}-${i}')">📋 复制文案</button></div>${img ? `<img class="aplus-module-img" src="${img.url}"><div class="aplus-module-label">📎 ${img.originalName}</div>` : ''}<div class="aplus-module-title">${escapeHtml(mod.headline || '')}</div><div class="aplus-module-body" id="aplus-img-${lang}-${i}">${escapeHtml(mod.body || '')}</div></div>`;
+      });
+    }
+    if (data.featureHighlights && data.featureHighlights.items) {
+      html += `<div class="card-title"><span class="icon">✨</span> ${escapeHtml(data.featureHighlights.sectionTitle || '产品亮点')}</div><div class="aplus-features">${data.featureHighlights.items.map(item => `<div class="aplus-feature-item"><div class="feature-icon">${escapeHtml(item.icon || '✅')}</div><div class="feature-headline">${escapeHtml(item.headline || '')}</div><div class="feature-desc">${escapeHtml(item.description || '')}</div></div>`).join('')}</div>`;
+    }
+    if (data.comparisonChart && data.comparisonChart.rows) {
+      html += `<div class="card-title" style="margin-top:20px;"><span class="icon">📊</span> ${escapeHtml(data.comparisonChart.title || '对比表')}</div><div class="aplus-module"><table class="aplus-table"><thead><tr>${(data.comparisonChart.headers||['Feature','Our Product','Others']).map(h=>`<th>${escapeHtml(h)}</th>`).join('')}</tr></thead><tbody>${data.comparisonChart.rows.map(r=>`<tr>${r.map(c=>`<td>${escapeHtml(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+    }
+    if (data.technicalSpecs && data.technicalSpecs.specs) {
+      html += `<div class="card-title" style="margin-top:20px;"><span class="icon">📐</span> ${escapeHtml(data.technicalSpecs.title || '技术规格')}</div><div class="aplus-module"><div class="aplus-specs">${data.technicalSpecs.specs.map(s=>`<div class="aplus-spec-row"><span class="aplus-spec-label">${escapeHtml(s.label||'')}</span><span class="aplus-spec-value">${escapeHtml(s.value||'')}</span></div>`).join('')}</div></div>`;
+    }
+    container.innerHTML = html || '<div class="empty-state"><div class="icon">📭</div><h3>暂无内容</h3></div>';
+  }
+}
+
+function copyAplusText(elementId) {
+  const el = document.getElementById(elementId);
+  if (!el) return;
+  const text = el.innerText || el.textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    showToast('已复制到剪贴板', 'success');
+  }).catch(() => {
+    showToast('复制失败，请手动选择', 'error');
+  });
+}
+
+// ==================== REVIEW ANALYZER ====================
+let reviewAnalysisDone = false;
+let reviewReportText = '';
+
+function addReviewUrlRow() {
+  const container = document.getElementById('reviewUrlList');
+  const existing = container.querySelectorAll('.url-row');
+  if (existing.length >= 5) { showToast('最多5个产品链接', 'error'); return; }
+  const idx = existing.length + 1;
+  const row = document.createElement('div');
+  row.className = 'url-row';
+  row.innerHTML = `
+    <span class="url-index">#${idx}</span>
+    <input type="url" class="form-input url-input" placeholder="https://www.amazon.com/dp/ASIN">
+    <button class="btn-icon add" onclick="this.closest('.url-row').remove()" title="移除">✕</button>
+  `;
+  container.appendChild(row);
+}
+
+function toggleManualReviews() {
+  const area = document.getElementById('manualReviewInput');
+  const btn = document.getElementById('manualToggleBtn');
+  const urlInputs = document.querySelectorAll('#reviewUrlList .url-input');
+  if (area.style.display === 'none' || area.style.display === '') {
+    // 手动模式默认显示，点击隐藏
+    area.style.display = 'none';
+    btn.textContent = '📝 手动粘贴评论';
+    urlInputs.forEach(i => i.disabled = false);
+  } else {
+    area.style.display = 'block';
+    btn.textContent = '📝 手动粘贴评论（推荐）';
+    urlInputs.forEach(i => i.disabled = true);
+  }
+}
+
+function appendReviewProgress(msg, isError) {
+  const prog = document.getElementById('reviewProgress');
+  prog.style.display = 'block';
+  const line = document.createElement('div');
+  line.style.color = isError ? '#ff6b6b' : 'var(--text-secondary)';
+  line.textContent = msg;
+  prog.appendChild(line);
+  prog.scrollTop = prog.scrollHeight;
+}
+
+function parseManualReviews(text) {
+  const reviews = [];
+  
+  // 检测格式：评分|标题|内容
+  const hasPipeFormat = text.split('\n').filter(l => l.trim()).some(l => {
+    const parts = l.split('|');
+    return parts.length >= 3 && !isNaN(parseFloat(parts[0]));
+  });
+
+  if (hasPipeFormat) {
+    // 格式1：评分|标题|内容
+    const lines = text.split('\n').filter(l => l.trim());
+    for (const line of lines) {
+      const parts = line.split('|');
+      if (parts.length >= 3) {
+        reviews.push({
+          rating: parseFloat(parts[0]) || 0,
+          title: parts[1].trim(),
+          text: parts[2].trim(),
+          date: '', verified: false
+        });
+      } else if (line.trim().length > 10) {
+        reviews.push({ rating: 0, title: '', text: line.trim(), date: '', verified: false });
+      }
+    }
+  } else {
+    // 格式2：自由文本 - 按段落/空行分割
+    const chunks = text.split(/\n{2,}/).filter(c => c.trim().length > 10);
+    for (const chunk of chunks) {
+      const clean = chunk.replace(/\n/g, ' ').trim();
+      // 尝试检测星级
+      let rating = 0;
+      const starMatch = clean.match(/([\d.]+)\s*(?:out of|stars?|★|颗星|星)/i) || clean.match(/^([\d.]+)\s/);
+      if (starMatch && parseFloat(starMatch[1]) <= 5 && parseFloat(starMatch[1]) >= 1) {
+        rating = parseFloat(starMatch[1]);
+      }
+      reviews.push({ rating, title: '', text: clean, date: '', verified: false });
+    }
+    
+    // 如果按空行分割得到太少，按换行分割
+    if (reviews.length < 3) {
+      const lines = text.split('\n').filter(l => l.trim().length > 15);
+      if (lines.length > reviews.length) {
+        reviews.length = 0;
+        for (const line of lines) {
+          reviews.push({ rating: 0, title: '', text: line.trim(), date: '', verified: false });
+        }
+      }
+    }
+  }
+
+  return reviews;
+}
+
+async function startReviewAnalysis() {
+  const btn = document.getElementById('reviewAnalyzeBtn');
+  const apiKey = document.getElementById('apiKey').value.trim();
+  const manualText = document.getElementById('manualReviewInput').value.trim();
+  const manualArea = document.getElementById('manualReviewInput');
+
+  if (!apiKey) { showToast('请填写 DeepSeek API Key', 'error'); return; }
+
+  let reviews = [];
+  const prog = document.getElementById('reviewProgress');
+  prog.innerHTML = '';
+  prog.style.display = 'block';
+  document.getElementById('reviewStats').style.display = 'none';
+  document.getElementById('reviewReport').style.display = 'none';
+  document.getElementById('reviewPlaceholder').style.display = 'none';
+  document.getElementById('copyReviewBtn').style.display = 'none';
+
+  btn.disabled = true;
+  btn.textContent = '⏳ 分析中...';
+
+  try {
+    if (manualText && manualArea.style.display !== 'none') {
+      appendReviewProgress('📝 解析手动粘贴的评论...');
+      reviews = parseManualReviews(manualText);
+      appendReviewProgress(`✓ 解析到 ${reviews.length} 条评论`, reviews.length === 0);
+    } else {
+      const urlInputs = document.querySelectorAll('#reviewUrlList .url-input');
+      const urls = Array.from(urlInputs).map(i => i.value.trim()).filter(u => u.length > 0);
+
+      if (urls.length === 0) {
+        showToast('请至少输入一个产品链接或手动粘贴评论', 'error');
+        btn.disabled = false;
+        btn.textContent = '🔬 开始分析';
+        return;
+      }
+
+      const count = parseInt(document.getElementById('reviewCount').value) || 30;
+      const cookieVal = document.getElementById('reviewCookie').value.trim() || null;
+      appendReviewProgress(`🔍 爬取 ${urls.length} 个产品的评论（目标 ${count} 条）...`);
+      if (cookieVal) appendReviewProgress('🍪 使用Amazon Cookie登录...');
+
+      const resp = await fetch('/api/scrape-reviews', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ urls, count, cookieJson: cookieVal })
+      });
+      const result = await resp.json();
+
+      // 显示每个URL的爬取状态
+      if (result.perUrl) {
+        for (const pu of result.perUrl) {
+          const shortUrl = pu.url.length > 50 ? pu.url.slice(0, 50) + '...' : pu.url;
+          if (pu.status === 'success') {
+            appendReviewProgress(`  ✅ ${shortUrl} — ${pu.reviewsCount} 条评论`, false);
+          } else if (pu.status === 'blocked') {
+            appendReviewProgress(`  🚫 ${shortUrl} — 被拦截 (503)`, true);
+          } else {
+            appendReviewProgress(`  ❌ ${shortUrl} — ${pu.error || '失败'}`, true);
+          }
+        }
+      }
+
+      if (!result.success) {
+        appendReviewProgress(`✗ ${result.error}`, true);
+        appendReviewProgress('💡 提示: 可尝试手动粘贴评论', false);
+        btn.disabled = false;
+        btn.textContent = '🔬 重试';
+        return;
+      }
+
+      reviews = result.data.reviews;
+      const s = result.data.stats;
+      appendReviewProgress(`✓ 成功 ${s.successCount} 个产品, 共 ${s.totalReviews} 条评论`);
+      if (s.failCount > 0) {
+        appendReviewProgress(`⚠️ ${s.failCount} 个产品爬取失败`, true);
+        s.errors.forEach(e => appendReviewProgress(`  - ${e.url}: ${e.message}`, true));
+      }
+    }
+
+    if (reviews.length === 0) {
+      showToast('未获取到任何评论', 'error');
+      btn.disabled = false;
+      btn.textContent = '🔬 重试';
+      return;
+    }
+
+    // 显示统计
+    const avgRating = (reviews.reduce((s, r) => s + r.rating, 0) / reviews.length).toFixed(1);
+    const positive = reviews.filter(r => r.rating >= 4).length;
+    const negative = reviews.filter(r => r.rating <= 2).length;
+    const neutral = reviews.length - positive - negative;
+
+    const statsDiv = document.getElementById('reviewStats');
+    statsDiv.innerHTML = `
+      <div class="card-title">📊 评论统计概览</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px;">
+        <div>总评论数: <strong>${reviews.length}</strong></div>
+        <div>平均评分: <strong>${avgRating}/5</strong></div>
+        <div style="color:#51cf66;">好评(4-5★): <strong>${positive} 条</strong> (${Math.round(positive/reviews.length*100)}%)</div>
+        <div style="color:#ff6b6b;">差评(1-2★): <strong>${negative} 条</strong> (${Math.round(negative/reviews.length*100)}%)</div>
+        <div style="color:#ffd43b;">中评(3★): <strong>${neutral} 条</strong> (${Math.round(neutral/reviews.length*100)}%)</div>
+      </div>
+    `;
+    statsDiv.style.display = 'block';
+
+    // AI 分析
+    appendReviewProgress('🤖 调用 DeepSeek AI 深度分析中（可能需要1-2分钟）...');
+
+    const aiResp = await fetch('/api/analyze-reviews', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ apiKey, reviews, productUrls: [] })
+    });
+    const aiResult = await aiResp.json();
+
+    if (aiResult.success) {
+      reviewReportText = aiResult.data.report;
+      const reportDiv = document.getElementById('reviewReport');
+      // 简单 Markdown 渲染
+      reportDiv.innerHTML = aiResult.data.report
+        .replace(/^### (.+)$/gm, '<h3 style="color:var(--accent);margin:16px 0 8px;">$1</h3>')
+        .replace(/^## (.+)$/gm, '<h2 style="color:var(--accent);margin:20px 0 10px;font-size:18px;">$1</h2>')
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+        .replace(/^- (.+)$/gm, '<li style="margin:4px 0 4px 20px;">$1</li>')
+        .replace(/\|(.+)\|/g, (m) => {
+          if (m.includes('---')) return '';
+          const cells = m.split('|').filter(c => c.trim());
+          return '<tr>' + cells.map(c => `<td style="padding:4px 8px;border:1px solid rgba(255,255,255,0.1);">${c.trim()}</td>`).join('') + '</tr>';
+        })
+        .replace(/^\|/gm, '<table style="width:100%;border-collapse:collapse;margin:8px 0;"><tr>')
+        .replace(/<\/tr>\s*<tr>/g, '</tr><tr>')
+        .replace(/\n\n/g, '<br><br>');
+
+      reportDiv.style.display = 'block';
+      document.getElementById('copyReviewBtn').style.display = '';
+      appendReviewProgress('✅ 分析完成！', false);
+      showToast('✅ 分析完成！', 'success');
+      reviewAnalysisDone = true;
+    } else {
+      appendReviewProgress(`✗ AI分析失败: ${aiResult.error}`, true);
+      showToast(`❌ ${aiResult.error}`, 'error');
+    }
+  } catch (err) {
+    appendReviewProgress(`❌ 错误: ${err.message}`, true);
+    showToast(`❌ ${err.message}`, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🔬 开始分析';
+  }
+}
+
+function copyReviewReport() {
+  if (!reviewReportText) return;
+  navigator.clipboard.writeText(reviewReportText).then(() => {
+    showToast('📋 报告已复制到剪贴板', 'success');
+  }).catch(() => {
+    showToast('复制失败，请手动选择', 'error');
+  });
+}
+</script>
+
+</body>
+</html>
