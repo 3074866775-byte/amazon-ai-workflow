@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Amazon AI Workflow — 跨境电商全流程AI工作流</title>
+<style>
+  :root { --bg:#0a0e17; --card:#141824; --accent:#ff9900; --text:#e1e4ed; --dim:#8b8fa3; }
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--text);font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;line-height:1.7}
+  .hero{text-align:center;padding:80px 20px 60px;background:linear-gradient(135deg,#0a0e17 0%,#1a1030 50%,#0a0e17 100%)}
+  .hero h1{font-size:3em;background:linear-gradient(135deg,#ff9900,#ff6600);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:16px}
+  .hero p{font-size:1.2em;color:var(--dim);max-width:700px;margin:0 auto}
+  .badge{margin-top:20px;display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+  .badge span{background:rgba(255,153,0,0.1);border:1px solid rgba(255,153,0,0.3);padding:4px 14px;border-radius:20px;font-size:13px}
+  .container{max-width:1000px;margin:0 auto;padding:40px 20px}
+  h2{font-size:1.8em;margin:0 0 24px;color:var(--accent)}
+  .features{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px;margin-bottom:40px}
+  .card{background:var(--card);border:1px solid rgba(255,255,255,0.06);border-radius:16px;padding:24px;transition:.2s}
+  .card:hover{border-color:rgba(255,153,0,0.3)}
+  .card h3{font-size:1.2em;margin-bottom:8px}
+  .card p{color:var(--dim);font-size:14px}
+  .screenshot{border-radius:12px;border:1px solid rgba(255,255,255,0.1);max-width:100%;margin:20px 0}
+  .links{display:flex;gap:16px;justify-content:center;margin:40px 0;flex-wrap:wrap}
+  .btn{display:inline-block;padding:12px 28px;border-radius:30px;font-weight:600;text-decoration:none;transition:.2s}
+  .btn-primary{background:var(--accent);color:#000}
+  .btn-primary:hover{background:#ffaa22}
+  .btn-outline{border:2px solid var(--accent);color:var(--accent)}
+  .btn-outline:hover{background:rgba(255,153,0,0.1)}
+  code{background:rgba(255,255,255,0.06);padding:2px 8px;border-radius:6px;font-size:13px}
+  .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:16px;margin:30px 0}
+  .stat{text-align:center;padding:20px;background:var(--card);border-radius:12px}
+  .stat .num{font-size:2em;font-weight:700;color:var(--accent)}
+  .stat .label{font-size:13px;color:var(--dim);margin-top:4px}
+  .tech{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+  .tech span{background:rgba(255,255,255,0.05);padding:3px 12px;border-radius:12px;font-size:12px}
+  footer{text-align:center;padding:40px;color:var(--dim);font-size:13px;border-top:1px solid rgba(255,255,255,0.04)}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>🦞 Amazon AI Workflow</h1>
+  <p>跨境电商全流程AI工作流 — 竞品分析 · AI内容优化 · 多语言本地化 · 评论情感分析 · A+ Content生成</p>
+  <div class="badge">
+    <span>Node.js + Express</span><span>DeepSeek v4 Pro</span><span>Cheerio 爬虫</span><span>Puppeteer</span><span>12语种翻译</span><span>SPA 零框架</span>
+  </div>
+</div>
+
+<div class="container">
+  <div class="stats">
+    <div class="stat"><div class="num">6</div><div class="label">API 路由</div></div>
+    <div class="stat"><div class="num">3</div><div class="label">功能模块</div></div>
+    <div class="stat"><div class="num">12</div><div class="label">目标语言</div></div>
+    <div class="stat"><div class="num">~3500</div><div class="label">行代码</div></div>
+  </div>
+
+  <h2>✨ 功能模块</h2>
+  <div class="features">
+    <div class="card">
+      <h3>📋 Listing 优化生成</h3>
+      <p>爬取竞品标题/五点/产品描述 → DeepSeek v4 Pro AI重写 → 12语种本地化翻译输出。支持字数限制、多版本一键切换、独立复制。</p>
+    </div>
+    <div class="card">
+      <h3>🖼️ A+ Content 生成</h3>
+      <p>AI生成品牌故事、产品对比矩阵、场景化图文模块、技术规格表。支持图片上传+DeepSeek视觉识别。</p>
+    </div>
+    <div class="card">
+      <h3>📊 评论情感分析</h3>
+      <p>竞品评论深度分析：🔥高频痛点分类、⭐高频赞美提炼、💡未满足需求挖掘、🎯使用场景洞察、📈综合评分卡。</p>
+    </div>
+    <div class="card">
+      <h3>🌍 多语言本地化</h3>
+      <p>EN/FR/DE/ES/IT/JP/PT/NL/PL/SV/AR/TR 12种语言，非直译而是符合当地用语习惯的文化适配翻译。</p>
+    </div>
+    <div class="card">
+      <h3>🔍 智能爬虫引擎</h3>
+      <p>Cheerio静态页解析 + Puppeteer无头浏览器双引擎。产品页自动爬取，评论页支持Cookie登录态爬取。每URL状态可视化，失败无数据时主动提醒。</p>
+    </div>
+    <div class="card">
+      <h3>📋 透明化反馈</h3>
+      <p>每个竞品URL爬取结果可视（✅成功/❌失败），无竞品数据时弹窗警告，拒绝静默失败。支持手动粘贴兜底。</p>
+    </div>
+  </div>
+
+  <h2>🛠️ 技术架构</h2>
+  <div class="card" style="margin-bottom:40px">
+    <p><strong>后端:</strong> Node.js + Express (6 RESTful API 路由)</p>
+    <p><strong>前端:</strong> 原生 HTML/CSS/JS SPA（零框架依赖，3模式切换）</p>
+    <p><strong>爬虫:</strong> Cheerio（静态页）+ Puppeteer（动态页/Cookie登录）</p>
+    <p><strong>AI:</strong> DeepSeek v4 Pro API（deepseek-chat）</p>
+    <div class="tech">
+      <span>Express</span><span>Cheerio</span><span>Puppeteer</span><span>Axios</span><span>DeepSeek API</span><span>Multer</span>
+    </div>
+  </div>
+
+  <h2>🚀 快速开始</h2>
+  <div class="card" style="margin-bottom:40px">
+    <p><code>git clone https://github.com/3074866775-byte/amazon-ai-workflow</code></p>
+    <p><code>npm install</code></p>
+    <p><code>npm start</code> → <strong>http://localhost:3456</strong></p>
+    <p style="margin-top:8px;color:var(--dim)">需要 DeepSeek API Key — <a href="https://platform.deepseek.com/api_keys" style="color:var(--accent)">免费获取</a></p>
+  </div>
+
+  <div class="links">
+    <a href="https://github.com/3074866775-byte/amazon-ai-workflow" class="btn btn-primary">📦 GitHub 仓库</a>
+    <a href="https://render.com/deploy?repo=https://github.com/3074866775-byte/amazon-ai-workflow" class="btn btn-outline">🚀 一键部署到 Render</a>
+  </div>
+</div>
+
+<footer>
+  Built with ❤️ for Amazon sellers · MIT License · 2026
+</footer>
+
+</body>
+</html>
